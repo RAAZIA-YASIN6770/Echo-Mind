@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: socratic-engine
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: socratic-engine
+  template:
+    metadata:
+      labels:
+        app: socratic-engine
+    spec:
+      containers:
+        - name: socratic-engine
+          image: socratic-engine:latest
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: socratic-engine
+spec:
+  selector:
+    app: socratic-engine
+  ports:
+    - port: 80
+      targetPort: 8000
+  type: ClusterIP

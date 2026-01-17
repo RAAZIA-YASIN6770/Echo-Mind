@@ -1,0 +1,51 @@
+openapi: 3.0.3
+info:
+  title: Eco-Mind API (Phase 1)
+  version: 0.1.0
+servers:
+  - url: https://api.ecomind.ai/v1
+paths:
+  /auth/register:
+    post:
+      summary: Create user
+      requestBody:
+        required: true
+      responses:
+        '201':
+          description: Created
+  /auth/login:
+    post:
+      summary: Login (returns JWT)
+      requestBody: {}
+      responses:
+        '200':
+          description: OK
+  /users/{id}:
+    get:
+      summary: Get user profile (auth)
+      parameters:
+        - name: id
+          in: path
+          required: true
+      responses:
+        '200':
+          description: OK
+  /chat:
+    post:
+      summary: Send user message to Socratic engine
+      requestBody: {}
+      responses:
+        '200':
+          description: Hint response
+  /progress:
+    get:
+      summary: Get concept progress for user
+      responses:
+        '200':
+          description: OK
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

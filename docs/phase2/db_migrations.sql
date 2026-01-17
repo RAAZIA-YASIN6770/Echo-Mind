@@ -1,0 +1,11 @@
+-- Phase 2 migrations placeholders
+-- Add migration scripts for Postgres: parental_consent, provider_metrics, telemetry_events
+
+-- Example: parental_consent
+-- CREATE TABLE parental_consent (
+--   id SERIAL PRIMARY KEY,
+--   user_id UUID NOT NULL,
+--   guardian_contact JSONB,
+--   status VARCHAR(32) NOT NULL,
+--   created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+-- );

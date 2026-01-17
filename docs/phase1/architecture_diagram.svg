@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420">
+  <rect x="10" y="10" width="880" height="400" fill="#fff" stroke="#ccc"/>
+  <text x="30" y="40" font-family="Arial" font-size="16" fill="#222">Eco-Mind System Architecture (Phase 1)</text>
+  <g>
+    <rect x="40" y="70" width="200" height="60" fill="#e8f4ff" stroke="#3b82f6"/>
+    <text x="60" y="100" font-family="Arial" font-size="12">Edge Layer (PII scrub, filters)</text>
+    <rect x="300" y="70" width="220" height="60" fill="#eef6e8" stroke="#10b981"/>
+    <text x="320" y="100" font-family="Arial" font-size="12">API / FastAPI (Auth, Chat, Progress)</text>
+    <rect x="560" y="70" width="260" height="60" fill="#fff4e6" stroke="#f59e0b"/>
+    <text x="580" y="100" font-family="Arial" font-size="12">Socratic Engine + LLM Adapter</text>
+
+    <line x1="240" y1="100" x2="300" y2="100" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="520" y1="100" x2="560" y2="100" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="120" y="180" width="200" height="80" fill="#f0f9ff" stroke="#6366f1"/>
+    <text x="140" y="210" font-family="Arial" font-size="12">PostgreSQL (users, progress)</text>
+    <rect x="380" y="180" width="160" height="80" fill="#fff1f2" stroke="#ef4444"/>
+    <text x="400" y="210" font-family="Arial" font-size="12">Redis (cache, sessions)</text>
+    <rect x="580" y="180" width="200" height="80" fill="#f7ffeb" stroke="#84cc16"/>
+    <text x="600" y="210" font-family="Arial" font-size="12">S3 (assets)</text>
+
+    <line x1="200" y1="150" x2="200" y2="180" stroke="#666" stroke-width="2"/>
+    <line x1="420" y1="150" x2="420" y2="180" stroke="#666" stroke-width="2"/>
+
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L6,3 z" fill="#666" />
+      </marker>
+    </defs>
+  </g>
+</svg>

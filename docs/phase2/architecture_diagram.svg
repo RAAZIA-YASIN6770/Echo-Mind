@@ -1,0 +1,9 @@
+<!-- Placeholder SVG: Replace with updated Phase 2 architecture diagram -->
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400">
+  <rect x="20" y="20" width="200" height="60" fill="#E3F2FD" stroke="#1976D2" />
+  <text x="30" y="55" font-family="Arial" font-size="12">API Layer (FastAPI/Django)</text>
+  <rect x="260" y="20" width="200" height="60" fill="#F1F8E9" stroke="#388E3C" />
+  <text x="270" y="55" font-family="Arial" font-size="12">Socratic Engine</text>
+  <rect x="500" y="20" width="200" height="60" fill="#FFF3E0" stroke="#F57C00" />
+  <text x="510" y="55" font-family="Arial" font-size="12">LLM Provider / Adapter</text>
+</svg>

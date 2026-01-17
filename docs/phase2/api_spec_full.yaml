@@ -1,0 +1,5 @@
+# Phase 2 full API spec (placeholder)
+# Copy Phase 1 spec and extend with Phase 2 endpoints and schemas.
+# ACTIONS:
+# - Add request/response schemas for parental consent, telemetry, provider metrics
+# - Define WebSocket contract for real-time updates

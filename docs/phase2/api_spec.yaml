@@ -1,0 +1,66 @@
+openapi: 3.0.3
+info:
+  title: Eco-Mind API (Phase 2)
+  version: 0.2.0
+servers:
+  - url: https://api.ecomind.ai/v2
+paths:
+  /auth/register:
+    post:
+      summary: Create user (extended)
+      requestBody:
+        required: true
+      responses:
+        '201':
+          description: Created
+  /auth/login:
+    post:
+      summary: Login (returns JWT)
+      requestBody: {}
+      responses:
+        '200':
+          description: OK
+  /users/{id}:
+    get:
+      summary: Get user profile (auth)
+      parameters:
+        - name: id
+          in: path
+          required: true
+      responses:
+        '200':
+          description: OK
+  /chat:
+    post:
+      summary: Send user message to Socratic engine
+      requestBody: {}
+      responses:
+        '200':
+          description: Hint response
+  /progress:
+    get:
+      summary: Get concept progress for user
+      responses:
+        '200':
+          description: OK
+  /parental-consent:
+    post:
+      summary: Submit parental consent
+      requestBody: {}
+      responses:
+        '201':
+          description: Consent recorded
+  /provider/status:
+    get:
+      summary: LLM provider status and failover info
+      responses:
+        '200':
+          description: OK
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+# TODO: expand schemas, error responses, WebSocket upgrade paths, and telemetry endpoints.

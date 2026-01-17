@@ -1,0 +1,144 @@
+openapi: 3.0.3
+info:
+  title: Eco-Mind API (Phase 1)
+  version: 0.1.0
+servers:
+  - url: https://api.ecomind.ai/v1
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        role:
+          type: string
+        display_name:
+          type: string
+    RegisterRequest:
+      type: object
+      required: [email, password, role]
+      properties:
+        email: {type: string}
+        password: {type: string}
+        role: {type: string, enum: [student,parent]}
+        display_name: {type: string}
+        date_of_birth: {type: string, format: date}
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: {type: string}
+        password: {type: string}
+    ChatRequest:
+      type: object
+      required: [user_id, message]
+      properties:
+        user_id: {type: string, format: uuid}
+        message: {type: string}
+        client_ts: {type: string, format: date-time}
+    ChatResponse:
+      type: object
+      properties:
+        hint: {type: string}
+        hint_level: {type: integer}
+        meta: {type: object}
+paths:
+  /auth/register:
+    post:
+      summary: Create user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /auth/login:
+    post:
+      summary: Login (returns JWT)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: {type: string}
+  /chat:
+    post:
+      summary: Send user message to Socratic engine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: Hint response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+  /progress:
+    get:
+      summary: Get concept progress for user
+      parameters:
+        - in: query
+          name: user_id
+          required: true
+          schema: {type: string, format: uuid}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    concept_id: {type: string}
+                    status: {type: string}
+                    confidence_score: {type: number}
+  /admin/safety_logs:
+    get:
+      summary: Retrieve flagged safety logs (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: {type: string}
+                    user_id: {type: string}
+                    incident_type: {type: string}
+                    context_snippet: {type: string}
