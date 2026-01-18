@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Send } from 'lucide-react';
+import api from '../services/api';
 
 const ChatPage = () => {
     const [messages, setMessages] = useState([
@@ -8,19 +9,48 @@ const ChatPage = () => {
     ]);
     const [inputValue, setInputValue] = useState('');
 
-    const handleSend = () => {
+    const handleSend = async () => {
         if (!inputValue.trim()) return;
 
         // Add user message
-        const userMsg = { id: Date.now(), text: inputValue, sender: 'user' };
+        const userMsg = { id: Date.now(), text: inputValue.trim(), sender: 'user' };
         setMessages(prev => [...prev, userMsg]);
+        const currentInput = inputValue.trim(); // Save for API call
         setInputValue('');
 
-        // Simulate bot thinking and response
-        setTimeout(() => {
-            const botMsg = { id: Date.now() + 1, text: "That's an interesting thought! Can you tell me more about why you think that?", sender: 'bot' };
+        // Show loading/typing indicator (optional, simple approach for now)
+        // const loadingMsg = { id: 'loading', text: '...', sender: 'bot' };
+        // setMessages(prev => [...prev, loadingMsg]);
+
+        try {
+            // Import api service locally or at top level if not already imported
+            // Assuming api is exported from '../services/api'
+            // For this snippet, I will assume `import api from '../services/api';` is added at the top.
+
+            const response = await api.post('/chat/', { message: currentInput });
+
+            const botResponse = response.data.response;
+            const treeUpdate = response.data.tree_update;
+
+            const botMsg = {
+                id: Date.now() + 1,
+                text: botResponse,
+                sender: 'bot',
+                treeUpdate: treeUpdate // unique property to perhaps show a badge or toast
+            };
+
             setMessages(prev => [...prev, botMsg]);
-        }, 1000);
+
+            if (treeUpdate && treeUpdate.growth) {
+                // You could trigger a toast notification here about tree growth
+                console.log("Tree grew!", treeUpdate.message);
+            }
+
+        } catch (error) {
+            console.error("Chat Error:", error);
+            const errorMsg = { id: Date.now() + 2, text: "Sorry, I'm having trouble connecting to my mind right now. 🧠💥", sender: 'bot' };
+            setMessages(prev => [...prev, errorMsg]);
+        }
     };
 
     return (

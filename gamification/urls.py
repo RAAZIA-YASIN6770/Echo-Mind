@@ -8,6 +8,9 @@ from . import views
 app_name = 'gamification'
 
 urlpatterns = [
+    # API Root
+    path('', views.api_root, name='api_root'),
+
     # Knowledge Tree Endpoints
     path('tree/state/', views.get_tree_state, name='tree_state'),
     path('tree/node/', views.add_tree_node, name='add_node'),

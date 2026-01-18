@@ -24,6 +24,40 @@ def get_json_body(request):
         return {}
 
 
+@require_GET
+def api_root(request):
+    """
+    GET /api/gamification/
+    Welcome message and available endpoints
+    """
+    return JsonResponse({
+        'message': 'Welcome to the EchoMind Gamification API',
+        'endpoints': {
+            'tree': [
+                '/api/gamification/tree/state/',
+                '/api/gamification/tree/node/',
+                '/api/gamification/tree/health/'
+            ],
+            'streak': [
+                '/api/gamification/streak/',
+                '/api/gamification/streak/update/'
+            ],
+            'achievements': [
+                '/api/gamification/achievements/badges/',
+                '/api/gamification/achievements/available/'
+            ],
+            'challenges': [
+                '/api/gamification/challenges/daily/',
+                '/api/gamification/challenges/check-trigger/'
+            ],
+            'analytics': [
+                '/api/gamification/analytics/',
+                '/api/gamification/analytics/weekly-report/'
+            ]
+        }
+    })
+
+
 # ==================== KNOWLEDGE TREE ENDPOINTS ====================
 
 @require_GET

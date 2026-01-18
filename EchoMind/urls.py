@@ -23,4 +23,5 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('api/health/', views.health, name='health'),
     path('api/gamification/', include('gamification.urls')),
+    path('api/chat/', include('socratic_engine.urls')),
 ]
