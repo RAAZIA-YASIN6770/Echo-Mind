@@ -1,4 +1,8 @@
-import google.generativeai as genai
+try:
+    import google.generativeai as genai
+    GOOGLE_AUTH_AVAILABLE = True
+except ImportError:
+    GOOGLE_AUTH_AVAILABLE = False
 import os
 from django.conf import settings
 
@@ -7,13 +11,20 @@ class SocraticLLM:
     
     def __init__(self):
         api_key = os.getenv('GEMINI_API_KEY')
-        if api_key:
-            genai.configure(api_key=api_key)
-            self.model = genai.GenerativeModel('gemini-pro')
-            self.active = True
+        if api_key and GOOGLE_AUTH_AVAILABLE:
+            try:
+                genai.configure(api_key=api_key)
+                self.model = genai.GenerativeModel('gemini-pro')
+                self.active = True
+            except Exception as e:
+                print(f"Gemini Configuration Error: {e}")
+                self.active = False
         else:
             self.active = False
-            print("WARNING: GEMINI_API_KEY not found in environment variables.")
+            if not GOOGLE_AUTH_AVAILABLE:
+                print("WARNING: google-generativeai library is NOT installed.")
+            if not api_key:
+                print("WARNING: GEMINI_API_KEY not found in environment variables.")
 
     def get_response(self, user_message, chat_history=None):
         """Generates a Socratic response to the user message"""
