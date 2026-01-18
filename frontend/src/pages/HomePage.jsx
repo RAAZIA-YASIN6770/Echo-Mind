@@ -1,7 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
+    const navigate = useNavigate();
+
     return (
         <div className="container" style={{ paddingBottom: '8rem', paddingTop: '4rem' }}>
             <header className="text-center" style={{ marginBottom: '4rem' }}>
@@ -49,7 +52,13 @@ const HomePage = () => {
                     <p style={{ margin: '1rem 0', color: 'var(--color-text-muted)' }}>
                         Your tree is looking healthy! You've mastered 12 concepts this week.
                     </p>
-                    <button className="btn-primary" style={{ width: '100%', fontSize: '1rem' }}>View Tree</button>
+                    <button
+                        className="btn-primary"
+                        style={{ width: '100%', fontSize: '1rem' }}
+                        onClick={() => navigate('/tree')}
+                    >
+                        View Tree
+                    </button>
                 </motion.div>
 
                 {/* Feature 2 */}
@@ -105,7 +114,13 @@ const HomePage = () => {
                     <p style={{ margin: '1rem 0', color: 'var(--color-text-muted)' }}>
                         Stuck on a question? I'm here to help you think through it!
                     </p>
-                    <button className="btn-primary" style={{ width: '100%', fontSize: '1rem', background: '#0284C7' }}>Start Chat</button>
+                    <button
+                        className="btn-primary"
+                        style={{ width: '100%', fontSize: '1rem', background: '#0284C7' }}
+                        onClick={() => navigate('/chat')}
+                    >
+                        Start Chat
+                    </button>
                 </motion.div>
 
             </section>

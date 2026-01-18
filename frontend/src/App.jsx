@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import TreePage from './pages/TreePage';
+import ChatPage from './pages/ChatPage';
 
 function App() {
   return (
@@ -10,7 +11,8 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<HomePage />} />
           <Route path="tree" element={<TreePage />} />
-          {/* Add more routes here */}
+          <Route path="chat" element={<ChatPage />} />
+
           <Route path="*" element={<HomePage />} />
         </Route>
       </Routes>
