@@ -1,49 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Send } from 'lucide-react';
+import { Send, Trash2 } from 'lucide-react';
 import api from '../services/api';
 
 const ChatPage = () => {
-    const [messages, setMessages] = useState([
-        { id: 1, text: "Hello! I'm Eco-Mind, your Socratic mentor. What's on your mind today? 🌿", sender: 'bot' }
-    ]);
+    const defaultMessage = { id: 1, text: "Hello! I'm Eco-Mind, your Socratic mentor. What's on your mind today? 🌿", sender: 'bot' };
+    const [messages, setMessages] = useState([defaultMessage]);
     const [inputValue, setInputValue] = useState('');
+    const messagesEndRef = useRef(null);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
     const handleSend = async () => {
         if (!inputValue.trim()) return;
 
-        // Add user message
-        const userMsg = { id: Date.now(), text: inputValue.trim(), sender: 'user' };
+        const currentInput = inputValue.trim();
+        const userMsg = { id: Date.now(), text: currentInput, sender: 'user' };
         setMessages(prev => [...prev, userMsg]);
-        const currentInput = inputValue.trim(); // Save for API call
         setInputValue('');
 
-        // Show loading/typing indicator (optional, simple approach for now)
-        // const loadingMsg = { id: 'loading', text: '...', sender: 'bot' };
-        // setMessages(prev => [...prev, loadingMsg]);
-
         try {
-            // Import api service locally or at top level if not already imported
-            // Assuming api is exported from '../services/api'
-            // For this snippet, I will assume `import api from '../services/api';` is added at the top.
-
             const response = await api.post('/chat/', { message: currentInput });
-
             const botResponse = response.data.response;
             const treeUpdate = response.data.tree_update;
 
             const botMsg = {
                 id: Date.now() + 1,
                 text: botResponse,
-                sender: 'bot',
-                treeUpdate: treeUpdate // unique property to perhaps show a badge or toast
+                sender: 'bot'
             };
 
             setMessages(prev => [...prev, botMsg]);
 
-            // Show tree update notification
             if (treeUpdate && treeUpdate.growth) {
-                // Create a special notification message
                 const notificationMsg = {
                     id: Date.now() + 2,
                     text: treeUpdate.message,
@@ -54,30 +49,53 @@ const ChatPage = () => {
                 setTimeout(() => {
                     setMessages(prev => [...prev, notificationMsg]);
                 }, 500);
-
-                // Log for development
-                console.log("Tree Update:", treeUpdate);
             }
 
         } catch (error) {
             console.error("Chat Error:", error);
-            const errorMsg = { id: Date.now() + 2, text: "Sorry, I'm having trouble connecting to my mind right now. 🧠💥", sender: 'bot' };
+            const errorMsg = {
+                id: Date.now() + 2,
+                text: "Sorry, I'm having trouble connecting to my mind right now. 🧠💥",
+                sender: 'bot'
+            };
             setMessages(prev => [...prev, errorMsg]);
         }
     };
 
+    const handleReset = () => {
+        setMessages([defaultMessage]);
+    };
+
     return (
-        <div className="container" style={{ paddingBottom: '8rem', paddingTop: '2rem', height: '100vh', display: 'flex', flexDirection: 'column' }}>
-            <h1 className="text-center">Chat with Eco-Mind 🤖</h1>
+        <div className="container" style={{ paddingBottom: '2rem', paddingTop: '2rem', height: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h1 style={{ margin: 0 }}>Chat with Eco-Mind 🤖</h1>
+                <button
+                    onClick={handleReset}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.5rem 1rem',
+                        background: '#FEE2E2',
+                        color: '#EF4444',
+                        fontSize: '0.9rem',
+                        fontWeight: 'bold',
+                        border: '1px solid #FECACA'
+                    }}
+                >
+                    <Trash2 size={18} />
+                    Reset Conversation
+                </button>
+            </div>
 
             <div className="glass-panel" style={{
                 flex: 1,
-                marginTop: '1rem',
-                marginBottom: '6rem', // Space for input area
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',
-                position: 'relative'
+                position: 'relative',
+                marginBottom: '1rem'
             }}>
                 {/* Chat Messages Area */}
                 <div style={{ flex: 1, padding: '2rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -91,23 +109,26 @@ const ChatPage = () => {
                                 maxWidth: msg.sender === 'notification' ? '90%' : '80%',
                                 padding: '1rem 1.5rem',
                                 borderRadius: msg.sender === 'notification' ? '1rem' : (msg.sender === 'user' ? '1.5rem 1.5rem 0 1.5rem' : '1.5rem 1.5rem 1.5rem 0'),
-                                backgroundColor: msg.sender === 'notification' ? 'transparent' : (msg.sender === 'user' ? 'var(--color-primary)' : 'white'),
-                                background: msg.sender === 'notification' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'none',
-                                color: msg.sender === 'notification' ? 'white' : (msg.sender === 'user' ? 'white' : 'var(--color-text-main)'),
+                                // Fixed: Use a single background property to avoid conflicts
+                                background: msg.sender === 'notification'
+                                    ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                                    : (msg.sender === 'user' ? '#10B981' : 'white'),
+                                color: (msg.sender === 'user' || msg.sender === 'notification') ? 'white' : '#064E3B',
                                 boxShadow: msg.sender === 'notification' ? '0 8px 20px rgba(102, 126, 234, 0.4)' : 'var(--shadow-sm)',
                                 textAlign: msg.sender === 'notification' ? 'center' : 'left',
                                 fontWeight: msg.sender === 'notification' ? '600' : 'normal',
-                                border: msg.sender === 'notification' ? '2px solid rgba(255, 255, 255, 0.3)' : 'none'
+                                border: msg.sender === 'notification' ? '2px solid rgba(255, 255, 255, 0.3)' : '1px solid rgba(0,0,0,0.05)'
                             }}
                         >
                             {msg.text}
                         </motion.div>
                     ))}
+                    <div ref={messagesEndRef} />
                 </div>
 
                 {/* Fixed Input Area */}
                 <div style={{
-                    padding: '1rem 2rem',
+                    padding: '1.5rem 2rem',
                     background: 'white',
                     borderTop: '1px solid rgba(0,0,0,0.05)',
                     display: 'flex',
@@ -122,24 +143,24 @@ const ChatPage = () => {
                         placeholder="Type your question here..."
                         style={{
                             flex: 1,
-                            padding: '1rem',
+                            padding: '1.2rem',
                             borderRadius: 'var(--radius-full)',
                             border: '2px solid #E5E7EB',
-                            fontSize: '1rem',
+                            fontSize: '1.1rem',
+                            color: '#064E3B', // Deep green text
+                            backgroundColor: '#FFFFFF',
                             fontFamily: 'var(--font-body)',
                             outline: 'none',
                             transition: 'border-color 0.2s'
                         }}
-                        onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
-                        onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
                     />
                     <button
                         onClick={handleSend}
                         style={{
-                            width: '50px',
-                            height: '50px',
+                            width: '55px',
+                            height: '55px',
                             borderRadius: '50%',
-                            backgroundColor: 'var(--color-primary)',
+                            backgroundColor: '#10B981',
                             color: 'white',
                             display: 'flex',
                             alignItems: 'center',
