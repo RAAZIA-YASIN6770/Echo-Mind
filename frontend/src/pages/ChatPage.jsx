@@ -29,6 +29,7 @@ const ChatPage = () => {
             const response = await api.post('/chat/', { message: currentInput });
             const botResponse = response.data.response;
             const treeUpdate = response.data.tree_update;
+            const newBadges = response.data.new_badges || [];
 
             const botMsg = {
                 id: Date.now() + 1,
@@ -38,6 +39,7 @@ const ChatPage = () => {
 
             setMessages(prev => [...prev, botMsg]);
 
+            // 1. Show tree update notification
             if (treeUpdate && treeUpdate.growth) {
                 const notificationMsg = {
                     id: Date.now() + 2,
@@ -48,14 +50,31 @@ const ChatPage = () => {
 
                 setTimeout(() => {
                     setMessages(prev => [...prev, notificationMsg]);
-                }, 500);
+                }, 800);
             }
+
+            // 2. Show badge notifications
+            newBadges.forEach((badge, index) => {
+                const badgeMsg = {
+                    id: Date.now() + 10 + index,
+                    text: `🏆 ACHIEVEMENT UNLOCKED: ${badge.title}! ${badge.description}`,
+                    sender: 'notification',
+                    type: 'badge'
+                };
+
+                setTimeout(() => {
+                    setMessages(prev => [...prev, badgeMsg]);
+                }, 1500 + (index * 1000));
+            });
 
         } catch (error) {
             console.error("Chat Error:", error);
+            const backendError = error.response?.data?.error;
             const errorMsg = {
                 id: Date.now() + 2,
-                text: "Sorry, I'm having trouble connecting to my mind right now. 🧠💥",
+                text: backendError
+                    ? `Backend Error: ${backendError} 🧠💥`
+                    : "Sorry, I'm having trouble connecting to my mind right now. 🧠💥",
                 sender: 'bot'
             };
             setMessages(prev => [...prev, errorMsg]);
@@ -71,6 +90,7 @@ const ChatPage = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <h1 style={{ margin: 0 }}>Chat with Eco-Mind 🤖</h1>
                 <button
+                    type="button"
                     onClick={handleReset}
                     style={{
                         display: 'flex',
@@ -81,7 +101,9 @@ const ChatPage = () => {
                         color: '#EF4444',
                         fontSize: '0.9rem',
                         fontWeight: 'bold',
-                        border: '1px solid #FECACA'
+                        border: '1px solid #FECACA',
+                        borderRadius: '8px',
+                        cursor: 'pointer'
                     }}
                 >
                     <Trash2 size={18} />
@@ -109,15 +131,23 @@ const ChatPage = () => {
                                 maxWidth: msg.sender === 'notification' ? '90%' : '80%',
                                 padding: '1rem 1.5rem',
                                 borderRadius: msg.sender === 'notification' ? '1rem' : (msg.sender === 'user' ? '1.5rem 1.5rem 0 1.5rem' : '1.5rem 1.5rem 1.5rem 0'),
-                                // Fixed: Use a single background property to avoid conflicts
+                                backgroundColor: msg.sender === 'notification' ? 'transparent' : (msg.sender === 'user' ? '#10B981' : 'white'),
                                 background: msg.sender === 'notification'
-                                    ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                                    ? (msg.type === 'badge'
+                                        ? 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' // Gold for badges
+                                        : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)') // Purple for tree
                                     : (msg.sender === 'user' ? '#10B981' : 'white'),
                                 color: (msg.sender === 'user' || msg.sender === 'notification') ? 'white' : '#064E3B',
-                                boxShadow: msg.sender === 'notification' ? '0 8px 20px rgba(102, 126, 234, 0.4)' : 'var(--shadow-sm)',
+                                boxShadow: msg.sender === 'notification'
+                                    ? (msg.type === 'badge'
+                                        ? '0 8px 25px rgba(245, 158, 11, 0.5)' // Gold glow
+                                        : '0 8px 20px rgba(102, 126, 234, 0.4)') // Purple glow
+                                    : 'var(--shadow-sm)',
                                 textAlign: msg.sender === 'notification' ? 'center' : 'left',
                                 fontWeight: msg.sender === 'notification' ? '600' : 'normal',
-                                border: msg.sender === 'notification' ? '2px solid rgba(255, 255, 255, 0.3)' : '1px solid rgba(0,0,0,0.05)'
+                                border: msg.sender === 'notification'
+                                    ? '2px solid rgba(255, 255, 255, 0.3)'
+                                    : '1px solid rgba(0,0,0,0.05)'
                             }}
                         >
                             {msg.text}
