@@ -41,9 +41,22 @@ const ChatPage = () => {
 
             setMessages(prev => [...prev, botMsg]);
 
+            // Show tree update notification
             if (treeUpdate && treeUpdate.growth) {
-                // You could trigger a toast notification here about tree growth
-                console.log("Tree grew!", treeUpdate.message);
+                // Create a special notification message
+                const notificationMsg = {
+                    id: Date.now() + 2,
+                    text: treeUpdate.message,
+                    sender: 'notification',
+                    type: 'tree_growth'
+                };
+
+                setTimeout(() => {
+                    setMessages(prev => [...prev, notificationMsg]);
+                }, 500);
+
+                // Log for development
+                console.log("Tree Update:", treeUpdate);
             }
 
         } catch (error) {
@@ -74,13 +87,17 @@ const ChatPage = () => {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             style={{
-                                alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-                                maxWidth: '80%',
+                                alignSelf: msg.sender === 'notification' ? 'center' : (msg.sender === 'user' ? 'flex-end' : 'flex-start'),
+                                maxWidth: msg.sender === 'notification' ? '90%' : '80%',
                                 padding: '1rem 1.5rem',
-                                borderRadius: msg.sender === 'user' ? '1.5rem 1.5rem 0 1.5rem' : '1.5rem 1.5rem 1.5rem 0',
-                                backgroundColor: msg.sender === 'user' ? 'var(--color-primary)' : 'white',
-                                color: msg.sender === 'user' ? 'white' : 'var(--color-text-main)',
-                                boxShadow: 'var(--shadow-sm)'
+                                borderRadius: msg.sender === 'notification' ? '1rem' : (msg.sender === 'user' ? '1.5rem 1.5rem 0 1.5rem' : '1.5rem 1.5rem 1.5rem 0'),
+                                backgroundColor: msg.sender === 'notification' ? 'transparent' : (msg.sender === 'user' ? 'var(--color-primary)' : 'white'),
+                                background: msg.sender === 'notification' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'none',
+                                color: msg.sender === 'notification' ? 'white' : (msg.sender === 'user' ? 'white' : 'var(--color-text-main)'),
+                                boxShadow: msg.sender === 'notification' ? '0 8px 20px rgba(102, 126, 234, 0.4)' : 'var(--shadow-sm)',
+                                textAlign: msg.sender === 'notification' ? 'center' : 'left',
+                                fontWeight: msg.sender === 'notification' ? '600' : 'normal',
+                                border: msg.sender === 'notification' ? '2px solid rgba(255, 255, 255, 0.3)' : 'none'
                             }}
                         >
                             {msg.text}

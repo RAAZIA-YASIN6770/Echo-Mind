@@ -1,129 +1,226 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { Sparkles, TreePine, MessageCircle, Trophy } from 'lucide-react';
+import api from '../services/api';
+import StreakCounter from '../components/StreakCounter';
+import BadgeDisplay from '../components/BadgeDisplay';
+import ChallengeCard from '../components/ChallengeCard';
 
 const HomePage = () => {
-    const navigate = useNavigate();
+    const [stats, setStats] = useState({
+        concepts: 0,
+        masteredConcepts: 0,
+        streak: 0,
+        bestStreak: 0,
+        badges: 0,
+        treeHealth: 0
+    });
+    const [streakData, setStreakData] = useState(null);
+    const [badges, setBadges] = useState([]);
+    const [availableBadges, setAvailableBadges] = useState([]);
+    const [challenge, setChallenge] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchAllData();
+    }, []);
+
+    const fetchAllData = async () => {
+        setLoading(true);
+        try {
+            // Fetch analytics
+            const analyticsRes = await api.get('/gamification/analytics/');
+            const analyticsData = analyticsRes.data;
+
+            // Fetch streak
+            const streakRes = await api.get('/gamification/streak/');
+            setStreakData(streakRes.data);
+
+            // Fetch badges
+            const badgesRes = await api.get('/gamification/achievements/badges/');
+            setBadges(badgesRes.data.badges || []);
+
+            // Fetch available badges
+            const availableRes = await api.get('/gamification/achievements/available/');
+            setAvailableBadges(availableRes.data.badges || []);
+
+            // Fetch daily challenge
+            const challengeRes = await api.get('/gamification/challenges/daily/');
+            setChallenge(challengeRes.data.challenge);
+
+            // Update stats
+            setStats({
+                concepts: analyticsData.total_concepts || 0,
+                masteredConcepts: analyticsData.mastered_concepts || 0,
+                streak: streakRes.data.current_streak || 0,
+                bestStreak: streakRes.data.best_streak || 0,
+                badges: badgesRes.data.badges?.length || 0,
+                treeHealth: analyticsData.tree_health || 0
+            });
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
-        <div className="container" style={{ paddingBottom: '8rem', paddingTop: '4rem' }}>
-            <header className="text-center" style={{ marginBottom: '4rem' }}>
-                <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.5 }}
-                >
-                    <h1 style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>
-                        Welcome back, Explorer! 🚀
-                    </h1>
-                    <p style={{ fontSize: '1.5rem', color: 'var(--color-text-secondary)' }}>
-                        Ready to grow your mind today?
-                    </p>
-                </motion.div>
-            </header>
+        <div className="container" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
+            {/* Hero Section */}
+            <motion.div
+                className="text-center"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+            >
+                <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>
+                    Welcome to <span style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>EchoMind</span> 🌟
+                </h1>
+                <p style={{ fontSize: '1.3rem', color: 'var(--color-text-secondary)', maxWidth: '600px', margin: '0 auto 3rem' }}>
+                    Your AI-powered Socratic mentor for curious minds
+                </p>
+            </motion.div>
 
-            <section className="grid-features" style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                gap: '2rem'
-            }}>
+            {/* Streak Counter */}
+            <motion.div
+                style={{ marginBottom: '3rem', display: 'flex', justifyContent: 'center' }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+            >
+                <StreakCounter
+                    currentStreak={stats.streak}
+                    bestStreak={stats.bestStreak}
+                    loading={loading}
+                />
+            </motion.div>
 
-                {/* Feature 1 */}
-                <motion.div
-                    className="card"
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.1 }}
-                >
-                    <div style={{
-                        background: 'var(--color-primary-light)',
-                        width: '60px',
-                        height: '60px',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '2rem',
-                        marginBottom: '1rem'
-                    }}>
-                        🌳
-                    </div>
-                    <h3>Your Knowledge Tree</h3>
-                    <p style={{ margin: '1rem 0', color: 'var(--color-text-muted)' }}>
-                        Your tree is looking healthy! You've mastered 12 concepts this week.
-                    </p>
-                    <button
-                        className="btn-primary"
-                        style={{ width: '100%', fontSize: '1rem' }}
-                        onClick={() => navigate('/tree')}
+            {/* Feature Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
+                <FeatureCard
+                    icon={<MessageCircle size={40} />}
+                    title="Chat with AI"
+                    description="Ask questions and learn through guided discovery"
+                    link="/chat"
+                    color="#667eea"
+                    delay={0.3}
+                />
+                <FeatureCard
+                    icon={<TreePine size={40} />}
+                    title="Knowledge Tree"
+                    description="Watch your understanding grow with every concept"
+                    link="/tree"
+                    color="#764ba2"
+                    delay={0.4}
+                />
+                <FeatureCard
+                    icon={<Trophy size={40} />}
+                    title="Achievements"
+                    description="Earn badges and build your learning streak"
+                    link="/chat"
+                    color="#f093fb"
+                    delay={0.5}
+                />
+            </div>
+
+            {/* Stats Section */}
+            <motion.div
+                className="glass-panel"
+                style={{ padding: '2rem', marginBottom: '3rem' }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.6 }}
+            >
+                <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>Your Learning Journey</h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
+                    <StatCard icon="🌱" label="Concepts Learned" value={stats.concepts} loading={loading} />
+                    <StatCard icon="✅" label="Mastered" value={stats.masteredConcepts} loading={loading} />
+                    <StatCard icon="🏆" label="Badges Earned" value={stats.badges} loading={loading} />
+                    <StatCard icon="💚" label="Tree Health" value={`${stats.treeHealth}%`} loading={loading} />
+                </div>
+            </motion.div>
+
+            {/* Daily Challenge */}
+            <motion.div
+                style={{ marginBottom: '3rem' }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+            >
+                <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>Today's Challenge</h2>
+                <ChallengeCard challenge={challenge} loading={loading} />
+            </motion.div>
+
+            {/* Badges Section */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+            >
+                <BadgeDisplay
+                    badges={badges}
+                    availableBadges={availableBadges}
+                    loading={loading}
+                />
+            </motion.div>
+
+            {/* CTA Section */}
+            <motion.div
+                style={{ textAlign: 'center', marginTop: '3rem' }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.9 }}
+            >
+                <Link to="/chat" style={{ textDecoration: 'none' }}>
+                    <motion.button
+                        className="btn btn-primary"
+                        style={{ fontSize: '1.2rem', padding: '1rem 3rem', borderRadius: 'var(--radius-full)' }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                     >
-                        View Tree
-                    </button>
-                </motion.div>
+                        <Sparkles size={24} style={{ marginRight: '0.5rem' }} />
+                        Start Learning
+                    </motion.button>
+                </Link>
+            </motion.div>
+        </div>
+    );
+};
 
-                {/* Feature 2 */}
-                <motion.div
-                    className="card"
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                >
-                    <div style={{
-                        background: 'var(--color-accent-light)',
-                        width: '60px',
-                        height: '60px',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '2rem',
-                        marginBottom: '1rem'
-                    }}>
-                        🔥
-                    </div>
-                    <h3>Daily Streak</h3>
-                    <p style={{ margin: '1rem 0', color: 'var(--color-text-muted)' }}>
-                        You're on a <strong>5 day streak!</strong> Keep it up to earn Golden Leaves.
-                    </p>
-                    <div style={{ height: '8px', background: '#E5E7EB', borderRadius: '4px', overflow: 'hidden' }}>
-                        <div style={{ width: '70%', height: '100%', background: 'var(--color-accent)' }}></div>
-                    </div>
-                </motion.div>
+const FeatureCard = ({ icon, title, description, link, color, delay }) => {
+    return (
+        <Link to={link} style={{ textDecoration: 'none' }}>
+            <motion.div
+                className="card"
+                style={{
+                    padding: '2rem',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    borderTop: `4px solid ${color}`,
+                    height: '100%'
+                }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay, duration: 0.4 }}
+                whileHover={{ y: -10, boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}
+            >
+                <div style={{ color, marginBottom: '1rem' }}>{icon}</div>
+                <h3 style={{ marginBottom: '0.5rem', color: 'var(--color-text-main)' }}>{title}</h3>
+                <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem' }}>{description}</p>
+            </motion.div>
+        </Link>
+    );
+};
 
-                {/* Feature 3 */}
-                <motion.div
-                    className="card"
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                >
-                    <div style={{
-                        background: '#E0F2FE',
-                        width: '60px',
-                        height: '60px',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '2rem',
-                        marginBottom: '1rem'
-                    }}>
-                        🤖
-                    </div>
-                    <h3>Ask Eco-Mind</h3>
-                    <p style={{ margin: '1rem 0', color: 'var(--color-text-muted)' }}>
-                        Stuck on a question? I'm here to help you think through it!
-                    </p>
-                    <button
-                        className="btn-primary"
-                        style={{ width: '100%', fontSize: '1rem', background: '#0284C7' }}
-                        onClick={() => navigate('/chat')}
-                    >
-                        Start Chat
-                    </button>
-                </motion.div>
-
-            </section>
+const StatCard = ({ icon, label, value, loading }) => {
+    return (
+        <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>{icon}</div>
+            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '0.25rem' }}>
+                {loading ? '...' : value}
+            </div>
+            <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>{label}</div>
         </div>
     );
 };
