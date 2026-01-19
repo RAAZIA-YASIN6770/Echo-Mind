@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage';
 import TreePage from './pages/TreePage';
 import ChatPage from './pages/ChatPage';
 import ParentDashboard from './pages/ParentDashboard';
+import AchievementsPage from './pages/AchievementsPage';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="tree" element={<TreePage />} />
           <Route path="chat" element={<ChatPage />} />
           <Route path="parents" element={<ParentDashboard />} />
+          <Route path="achievements" element={<AchievementsPage />} />
 
           <Route path="*" element={<HomePage />} />
         </Route>
@@ -21,5 +23,7 @@ function App() {
     </Router>
   );
 }
+
+
 
 export default App;

@@ -75,10 +75,10 @@ const TreePage = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', textAlign: 'center' }}>
                     <div>
                         <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>
-                            {getTreeStateEmoji(treeData?.tree_state)}
+                            {getTreeStateEmoji(treeData?.state)}
                         </div>
                         <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>
-                            {treeData?.tree_state?.replace('_', ' ').toUpperCase() || 'SEEDLING'}
+                            {treeData?.state?.replace('_', ' ').toUpperCase() || 'SEEDLING'}
                         </div>
                         <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>Tree Stage</div>
                     </div>
@@ -91,7 +91,7 @@ const TreePage = () => {
                             Health Score
                         </div>
                         <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
-                            {treeData?.is_wilting ? '⚠️ Needs attention!' : '✅ Healthy'}
+                            {treeData?.is_wilted ? '⚠️ Needs attention!' : '✅ Healthy'}
                         </div>
                     </div>
 
@@ -197,7 +197,7 @@ const TreePage = () => {
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ duration: 1, type: 'spring' }}
                     >
-                        {getTreeStateEmoji(treeData?.tree_state)}
+                        {getTreeStateEmoji(treeData?.state)}
                     </motion.text>
                 </svg>
 

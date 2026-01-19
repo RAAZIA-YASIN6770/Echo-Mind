@@ -1,32 +1,47 @@
 :root {
   /* Colors - Nature & Growth Palette */
-  --color-primary: #10B981; /* Emerald 500 */
-  --color-primary-hover: #059669; /* Emerald 600 */
-  --color-primary-light: #D1FAE5; /* Emerald 100 */
-  
-  --color-secondary: #84CC16; /* Lime 500 */
-  --color-secondary-hover: #65A30D; /* Lime 600 */
-  
-  --color-accent: #F59E0B; /* Amber 500 */
-  --color-accent-hover: #D97706; /* Amber 600 */
-  --color-accent-light: #FEF3C7; /* Amber 100 */
-  
-  --color-danger: #EF4444; /* Red 500 */
-  --color-success: #22C55E; /* Green 500 */
-  
-  --color-background: #F0FDF4; /* Very light mint/green tint */
+  --color-primary: #10B981;
+  /* Emerald 500 */
+  --color-primary-hover: #059669;
+  /* Emerald 600 */
+  --color-primary-light: #D1FAE5;
+  /* Emerald 100 */
+
+  --color-secondary: #84CC16;
+  /* Lime 500 */
+  --color-secondary-hover: #65A30D;
+  /* Lime 600 */
+
+  --color-accent: #F59E0B;
+  /* Amber 500 */
+  --color-accent-hover: #D97706;
+  /* Amber 600 */
+  --color-accent-light: #FEF3C7;
+  /* Amber 100 */
+
+  --color-danger: #EF4444;
+  /* Red 500 */
+  --color-success: #22C55E;
+  /* Green 500 */
+
+  --color-background: #F0FDF4;
+  /* Very light mint/green tint */
   --color-surface: #FFFFFF;
-  --color-surface-glass: rgba(255, 255, 255, 0.85); /* For glassmorphism */
-  
-  --color-text-main: #064E3B; /* Deep Forest Green - softer than black */
-  --color-text-secondary: #374151; /* Dark Gray */
-  --color-text-muted: #6B7280; /* Gray 500 */
+  --color-surface-glass: rgba(255, 255, 255, 0.85);
+  /* For glassmorphism */
+
+  --color-text-main: #064E3B;
+  /* Deep Forest Green - softer than black */
+  --color-text-secondary: #374151;
+  /* Dark Gray */
+  --color-text-muted: #6B7280;
+  /* Gray 500 */
   --color-text-inverse: #FFFFFF;
 
   /* Typography */
   --font-heading: 'Fredoka', 'Outfit', system-ui, sans-serif;
   --font-body: 'Nunito', system-ui, sans-serif;
-  
+
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
@@ -57,8 +72,9 @@
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.3); /* Glowing effect */
-  
+  --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.3);
+  /* Glowing effect */
+
   /* Transitions */
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
@@ -80,16 +96,30 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
   font-weight: 600;
   line-height: 1.2;
   margin-bottom: var(--space-4);
 }
 
-h1 { font-size: var(--text-4xl); color: var(--color-primary-hover); }
-h2 { font-size: var(--text-3xl); }
-h3 { font-size: var(--text-2xl); }
+h1 {
+  font-size: var(--text-4xl);
+  color: var(--color-primary-hover);
+}
+
+h2 {
+  font-size: var(--text-3xl);
+}
+
+h3 {
+  font-size: var(--text-2xl);
+}
 
 button {
   font-family: var(--font-heading);
@@ -122,12 +152,29 @@ a:hover {
   padding: 0 var(--space-4);
 }
 
-.text-center { text-align: center; }
-.flex { display: flex; }
-.items-center { align-items: center; }
-.justify-center { justify-content: center; }
-.h-screen { height: 100vh; }
-.w-full { width: 100%; }
+.text-center {
+  text-align: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.h-screen {
+  height: 100vh;
+}
+
+.w-full {
+  width: 100%;
+}
 
 /* Glassmorphism Utility */
 .glass-panel {

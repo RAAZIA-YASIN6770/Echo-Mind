@@ -50,12 +50,12 @@ const HomePage = () => {
             setChallenge(challengeRes.data.challenge);
 
             // Update stats
-            const analytics = analyticsData.analytics;
+            const analytics = analyticsData.analytics || {};
             setStats({
-                concepts: analytics.concepts.total || 0,
-                masteredConcepts: analytics.concepts.mastered || 0,
-                streak: streakRes.data.streak.current || 0,
-                bestStreak: streakRes.data.streak.best || 0,
+                concepts: analytics.concepts?.total || 0,
+                masteredConcepts: analytics.concepts?.mastered || 0,
+                streak: streakRes.data.streak?.current || 0,
+                bestStreak: streakRes.data.streak?.best || 0,
                 badges: badgesRes.data.badges?.length || 0,
                 treeHealth: analytics.tree_health || 0
             });
