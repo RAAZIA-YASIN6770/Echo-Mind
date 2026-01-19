@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Sparkles, TreePine, MessageCircle, Trophy } from 'lucide-react';
+import { Sparkles, TreePine, MessageCircle, Trophy, ShieldCheck } from 'lucide-react';
 import api from '../services/api';
 import StreakCounter from '../components/StreakCounter';
 import BadgeDisplay from '../components/BadgeDisplay';
@@ -50,13 +50,14 @@ const HomePage = () => {
             setChallenge(challengeRes.data.challenge);
 
             // Update stats
+            const analytics = analyticsData.analytics;
             setStats({
-                concepts: analyticsData.total_concepts || 0,
-                masteredConcepts: analyticsData.mastered_concepts || 0,
-                streak: streakRes.data.current_streak || 0,
-                bestStreak: streakRes.data.best_streak || 0,
+                concepts: analytics.concepts.total || 0,
+                masteredConcepts: analytics.concepts.mastered || 0,
+                streak: streakRes.data.streak.current || 0,
+                bestStreak: streakRes.data.streak.best || 0,
                 badges: badgesRes.data.badges?.length || 0,
-                treeHealth: analyticsData.tree_health || 0
+                treeHealth: analytics.tree_health || 0
             });
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -115,12 +116,12 @@ const HomePage = () => {
                     delay={0.4}
                 />
                 <FeatureCard
-                    icon={<Trophy size={40} />}
-                    title="Achievements"
-                    description="Earn badges and build your learning streak"
-                    link="/chat"
-                    color="#f093fb"
-                    delay={0.5}
+                    icon={<ShieldCheck size={40} />}
+                    title="Parent Portal"
+                    description="Monitor safety alerts and review learning progress"
+                    link="/parents"
+                    color="#4F46E5"
+                    delay={0.6}
                 />
             </div>
 

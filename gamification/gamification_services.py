@@ -352,6 +352,7 @@ class AnalyticsManager:
                 'mastered_this_period': period_mastered,
                 'mastery_rate': round(mastered_nodes / total_nodes * 100, 1) if total_nodes > 0 else 0
             },
+            'tree_health': tree.health_score if 'tree' in locals() else 0,
             'streaks': {
                 'current': current_streak,
                 'best': best_streak

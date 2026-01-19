@@ -1,13 +1,56 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Send, Trash2 } from 'lucide-react';
+import { Send, Trash2, Mic, MicOff } from 'lucide-react';
 import api from '../services/api';
 
 const ChatPage = () => {
     const defaultMessage = { id: 1, text: "Hello! I'm Eco-Mind, your Socratic mentor. What's on your mind today? 🌿", sender: 'bot' };
     const [messages, setMessages] = useState([defaultMessage]);
     const [inputValue, setInputValue] = useState('');
+    const [isListening, setIsListening] = useState(false);
     const messagesEndRef = useRef(null);
+
+    // Voice recognition setup
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = useRef(null);
+
+    useEffect(() => {
+        if (SpeechRecognition) {
+            recognition.current = new SpeechRecognition();
+            recognition.current.continuous = false;
+            recognition.current.interimResults = false;
+            recognition.current.lang = 'en-US';
+
+            recognition.current.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                setInputValue(transcript);
+                setIsListening(false);
+            };
+
+            recognition.current.onerror = (event) => {
+                console.error("Speech Recognition Error:", event.error);
+                setIsListening(false);
+            };
+
+            recognition.current.onend = () => {
+                setIsListening(false);
+            };
+        }
+    }, [SpeechRecognition]);
+
+    const toggleListening = () => {
+        if (!recognition.current) {
+            alert("Sorry, your browser doesn't support voice input. Try using Chrome! 🎙️");
+            return;
+        }
+
+        if (isListening) {
+            recognition.current.stop();
+        } else {
+            setIsListening(true);
+            recognition.current.start();
+        }
+    };
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -30,6 +73,7 @@ const ChatPage = () => {
             const botResponse = response.data.response;
             const treeUpdate = response.data.tree_update;
             const newBadges = response.data.new_badges || [];
+            const newChallenge = response.data.new_challenge;
 
             const botMsg = {
                 id: Date.now() + 1,
@@ -66,6 +110,20 @@ const ChatPage = () => {
                     setMessages(prev => [...prev, badgeMsg]);
                 }, 1500 + (index * 1000));
             });
+
+            // 3. Show new challenge notification
+            if (newChallenge) {
+                const challengeMsg = {
+                    id: Date.now() + 50,
+                    text: `🌟 ${newChallenge.title}: ${newChallenge.text} (${newChallenge.duration} mins)`,
+                    sender: 'notification',
+                    type: 'challenge'
+                };
+
+                setTimeout(() => {
+                    setMessages(prev => [...prev, challengeMsg]);
+                }, 2500 + (newBadges.length * 1000));
+            }
 
         } catch (error) {
             console.error("Chat Error:", error);
@@ -135,13 +193,17 @@ const ChatPage = () => {
                                 background: msg.sender === 'notification'
                                     ? (msg.type === 'badge'
                                         ? 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' // Gold for badges
-                                        : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)') // Purple for tree
+                                        : (msg.type === 'challenge'
+                                            ? 'linear-gradient(135deg, #10B981 0%, #06B6D4 100%)' // Green/Teal for challenges
+                                            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)')) // Purple for tree
                                     : (msg.sender === 'user' ? '#10B981' : 'white'),
                                 color: (msg.sender === 'user' || msg.sender === 'notification') ? 'white' : '#064E3B',
                                 boxShadow: msg.sender === 'notification'
                                     ? (msg.type === 'badge'
                                         ? '0 8px 25px rgba(245, 158, 11, 0.5)' // Gold glow
-                                        : '0 8px 20px rgba(102, 126, 234, 0.4)') // Purple glow
+                                        : (msg.type === 'challenge'
+                                            ? '0 8px 25px rgba(16, 185, 129, 0.4)' // Green glow
+                                            : '0 8px 20px rgba(102, 126, 234, 0.4)')) // Purple glow
                                     : 'var(--shadow-sm)',
                                 textAlign: msg.sender === 'notification' ? 'center' : 'left',
                                 fontWeight: msg.sender === 'notification' ? '600' : 'normal',
@@ -165,17 +227,53 @@ const ChatPage = () => {
                     gap: '1rem',
                     alignItems: 'center'
                 }}>
+                    <button
+                        onClick={toggleListening}
+                        style={{
+                            width: '45px',
+                            height: '45px',
+                            borderRadius: '50%',
+                            backgroundColor: isListening ? '#EF4444' : '#F3F4F6',
+                            color: isListening ? 'white' : '#6B7280',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: 'none',
+                            cursor: 'pointer',
+                            position: 'relative'
+                        }}
+                    >
+                        {isListening ? (
+                            <>
+                                <MicOff size={20} />
+                                <motion.div
+                                    style={{
+                                        position: 'absolute',
+                                        width: '100%',
+                                        height: '100%',
+                                        borderRadius: '50%',
+                                        border: '4px solid #EF4444',
+                                        opacity: 0.5
+                                    }}
+                                    animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
+                                    transition={{ repeat: Infinity, duration: 1.5 }}
+                                />
+                            </>
+                        ) : (
+                            <Mic size={20} />
+                        )}
+                    </button>
                     <input
                         type="text"
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                        placeholder="Type your question here..."
+                        placeholder={isListening ? "Listening..." : "Type or speak your question..."}
                         style={{
                             flex: 1,
                             padding: '1.2rem',
                             borderRadius: 'var(--radius-full)',
-                            border: '2px solid #E5E7EB',
+                            border: `2px solid ${isListening ? '#EF4444' : '#E5E7EB'}`,
                             fontSize: '1.1rem',
                             color: '#064E3B', // Deep green text
                             backgroundColor: '#FFFFFF',
@@ -195,7 +293,9 @@ const ChatPage = () => {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            boxShadow: 'var(--shadow-md)'
+                            boxShadow: 'var(--shadow-md)',
+                            border: 'none',
+                            cursor: 'pointer'
                         }}
                     >
                         <Send size={24} />

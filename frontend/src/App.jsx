@@ -3,6 +3,7 @@ import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import TreePage from './pages/TreePage';
 import ChatPage from './pages/ChatPage';
+import ParentDashboard from './pages/ParentDashboard';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path="tree" element={<TreePage />} />
           <Route path="chat" element={<ChatPage />} />
+          <Route path="parents" element={<ParentDashboard />} />
 
           <Route path="*" element={<HomePage />} />
         </Route>

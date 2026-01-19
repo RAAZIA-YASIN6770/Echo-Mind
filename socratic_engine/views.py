@@ -5,7 +5,8 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from gamification.models import KnowledgeTree, TreeNode
 from gamification.tree_services import TreeStateManager, NodeManager
-from gamification.gamification_services import StreakManager, AchievementManager
+from gamification.gamification_services import StreakManager, AchievementManager, ChallengeManager
+from safety.services import SafetyService
 import json
 import random
 
@@ -43,7 +44,7 @@ def extract_concept(message):
     topics = {
         'photosynthesis': ['photosynthesis', 'plant', 'chlorophyll', 'sunlight'],
         'gravity': ['gravity', 'fall', 'weight', 'force', 'mass'],
-        'water_cycle': ['water', 'rain', 'evaporation', 'cycle'],
+        'water_cycle': ['water', 'rain', 'evaporation', 'cycle', 'cloud'],
         'mathematics': ['math', 'number', 'equation', 'solve', 'calculate'],
         'planets': ['planet', 'solar', 'earth', 'mars', 'space'],
         'energy': ['energy', 'power', 'electricity', 'heat'],
@@ -63,9 +64,10 @@ def extract_concept(message):
                     'category': 'science' if topic in ['photosynthesis', 'gravity', 'cells', 'energy'] else 'general'
                 }
     
+    # Generic concept if no keywords found
     return {
-        'concept_id': f'concept_{len(message_lower) % 10}',
-        'title': 'Critical Thinking',
+        'concept_id': f'discovery_{random.randint(1, 1000)}',
+        'title': 'New Discovery',
         'category': 'general'
     }
 
@@ -82,8 +84,22 @@ def chat_view(request):
 
         user, _ = User.objects.get_or_create(username='demo_user')
 
-        # Initialize badges if not already done
+        # 0. Safety Check - Phase 5 Integration
+        is_safe, sanitized_message, risk_reason = SafetyService.sanitize_input(user, user_message)
+        
+        if not is_safe:
+            return JsonResponse({
+                'response': "Oops! Let's keep our conversation friendly and safe for everyone. Can we talk about something else? 🌈✨",
+                'tree_update': {'growth': False, 'message': 'Safety first! 🛡️'},
+                'streak': {'current': 1}, 
+                'safety_alert': True
+            })
+
+        user_message = sanitized_message 
+
+        # Initialize gamification assets
         AchievementManager.initialize_badges()
+        ChallengeManager.initialize_challenges()
 
         # 1. Award 'login' badge if this is first interaction
         new_badges = AchievementManager.check_and_award_achievements(user, 'login')
@@ -91,10 +107,11 @@ def chat_view(request):
         # 2. Process the message
         bot_response = process_message(user_message)
 
-        # 3. Tree Logic - Increased probability for better feedback
-        should_add_concept = len(user_message.split()) >= 2 and random.random() > 0.3
+        # 3. Tree Logic - High probability for instant feedback
+        should_add_concept = len(user_message.split()) >= 1 and random.random() > 0.1
         
         tree_update = {'growth': False, 'message': 'Keep thinking! 💭'}
+        new_challenge = None
         
         if should_add_concept:
             tree, _ = KnowledgeTree.objects.get_or_create(user=user)
@@ -108,7 +125,7 @@ def chat_view(request):
                     concept_id=concept_data['concept_id'],
                     title=concept_data['title'],
                     category=concept_data['category'],
-                    confidence=0.3
+                    confidence=0.4 # Higher start
                 )
                 tree_update = {
                     'growth': True,
@@ -116,7 +133,7 @@ def chat_view(request):
                     'new_concept': concept_data['title']
                 }
             else:
-                existing_node.mastery_confidence = min(1.0, existing_node.mastery_confidence + 0.2) # Faster progress
+                existing_node.mastery_confidence = min(1.0, existing_node.mastery_confidence + 0.3) # Faster progress
                 existing_node.last_practiced = timezone.now()
                 existing_node.save()
                 
@@ -140,7 +157,19 @@ def chat_view(request):
                         'confidence': round(existing_node.mastery_confidence * 100)
                     }
 
-        # 4. Streak & Streak Badges
+            # 4. Check for Challenges (Every 2 concepts for better UX)
+            total_concepts = tree.nodes.count()
+            if total_concepts > 0 and total_concepts % 2 == 0:
+                # Trigger a new offline challenge
+                challenge = ChallengeManager.get_random_challenge()
+                if challenge:
+                    new_challenge = {
+                        'title': 'Real-World Discovery Challenge 🌍',
+                        'text': challenge.text,
+                        'duration': challenge.duration_minutes
+                    }
+
+        # 5. Streak & Streak Badges
         streak_obj, is_milestone, _ = StreakManager.update_streak(user)
         if is_milestone:
             streak_badges = AchievementManager.check_and_award_achievements(
@@ -148,7 +177,7 @@ def chat_view(request):
             )
             new_badges.extend(streak_badges)
 
-        # Prepare badge notifications for frontend
+        # Prepare badge notifications
         badge_notifications = [
             {'title': b.badge.title, 'description': b.badge.description} 
             for b in new_badges
@@ -158,7 +187,8 @@ def chat_view(request):
             'response': bot_response,
             'tree_update': tree_update,
             'streak': {'current': streak_obj.current_streak},
-            'new_badges': badge_notifications
+            'new_badges': badge_notifications,
+            'new_challenge': new_challenge
         })
 
     except Exception as e:

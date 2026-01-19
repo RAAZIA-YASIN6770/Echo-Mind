@@ -4,18 +4,23 @@ import api from '../services/api';
 
 const TreePage = () => {
     const [treeData, setTreeData] = useState(null);
+    const [badges, setBadges] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedNode, setSelectedNode] = useState(null);
 
     useEffect(() => {
-        fetchTreeData();
+        fetchData();
     }, []);
 
-    const fetchTreeData = async () => {
+    const fetchData = async () => {
         setLoading(true);
         try {
-            const response = await api.get('/gamification/tree/state/');
-            setTreeData(response.data);
+            const [treeRes, badgesRes] = await Promise.all([
+                api.get('/gamification/tree/state/'),
+                api.get('/gamification/achievements/badges/')
+            ]);
+            setTreeData(treeRes.data.data);
+            setBadges(badgesRes.data.badges || []);
         } catch (error) {
             console.error('Error fetching tree data:', error);
         } finally {
@@ -111,18 +116,62 @@ const TreePage = () => {
 
                 {/* SVG Tree */}
                 <svg width="100%" height="600" viewBox="-400 -400 800 800" style={{ position: 'relative', zIndex: 10 }}>
+                    {/* Sky/Achievement Stars */}
+                    {badges.map((badge, i) => (
+                        <motion.g
+                            key={badge.key}
+                            initial={{ opacity: 0, scale: 0 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: i * 0.2 }}
+                        >
+                            <circle
+                                cx={-300 + (i % 3) * 100 + (i > 2 ? 50 : 0)}
+                                cy={-300 + Math.floor(i / 3) * 80}
+                                r="25"
+                                fill="url(#badgeGradient)"
+                                style={{ filter: 'drop-shadow(0 0 10px rgba(245, 158, 11, 0.6))' }}
+                            />
+                            <text
+                                x={-300 + (i % 3) * 100 + (i > 2 ? 50 : 0)}
+                                y={-300 + Math.floor(i / 3) * 80}
+                                textAnchor="middle"
+                                dy="0.3em"
+                                fontSize="20"
+                            >
+                                🏆
+                            </text>
+                            <text
+                                x={-300 + (i % 3) * 100 + (i > 2 ? 50 : 0)}
+                                y={-300 + Math.floor(i / 3) * 80 + 40}
+                                textAnchor="middle"
+                                fontSize="12"
+                                fill="#D97706"
+                                fontWeight="bold"
+                            >
+                                {badge.title}
+                            </text>
+                        </motion.g>
+                    ))}
+
+                    <defs>
+                        <linearGradient id="badgeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#FDE68A" />
+                            <stop offset="100%" stopColor="#F59E0B" />
+                        </linearGradient>
+                    </defs>
+
                     {/* Tree trunk */}
                     <rect x="-30" y="250" width="60" height="150" fill="#8B4513" rx="10" />
 
-                    {/* Nodes */}
+                    {/* ... (existing nodes mapping) */}
                     {treeData?.nodes?.map((node, index) => (
                         <g key={node.concept_id} onClick={() => setSelectedNode(node)} style={{ cursor: 'pointer' }}>
                             <motion.circle
                                 cx={node.position_x || 0}
                                 cy={node.position_y || 0}
                                 r="15"
-                                fill={node.mastered ? '#00cc00' : '#cccccc'}
-                                stroke={node.mastered ? '#008800' : '#999999'}
+                                fill={node.mastered ? '#10B981' : '#E5E7EB'}
+                                stroke={node.mastered ? '#059669' : '#D1D5DB'}
                                 strokeWidth="2"
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
@@ -133,11 +182,7 @@ const TreePage = () => {
                                 <text
                                     x={node.position_x || 0}
                                     y={node.position_y || 0}
-                                    textAnchor="middle"
-                                    dy="0.3em"
-                                    fontSize="12"
-                                    fill="white"
-                                    fontWeight="bold"
+                                    textAnchor="middle" dy="0.3em" fontSize="12" fill="white" fontWeight="bold"
                                 >
                                     ✓
                                 </text>
@@ -146,24 +191,55 @@ const TreePage = () => {
                     ))}
 
                     {/* Main tree icon */}
-                    <text x="0" y="0" fontSize="120" textAnchor="middle" dy="0.3em">
+                    <motion.text
+                        x="0" y="0" fontSize="150" textAnchor="middle" dy="0.3em"
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 1, type: 'spring' }}
+                    >
                         {getTreeStateEmoji(treeData?.tree_state)}
-                    </text>
+                    </motion.text>
                 </svg>
 
                 {/* Legend */}
-                <div style={{ position: 'absolute', top: '2rem', right: '2rem', background: 'white', padding: '1rem', borderRadius: '1rem', boxShadow: 'var(--shadow-md)' }}>
-                    <h4 style={{ margin: '0 0 0.5rem 0' }}>Legend</h4>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                        <span style={{ width: '15px', height: '15px', borderRadius: '50%', background: '#00cc00', display: 'inline-block' }}></span>
-                        <span>Mastered</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{ width: '15px', height: '15px', borderRadius: '50%', background: '#cccccc', display: 'inline-block' }}></span>
-                        <span>Learning</span>
-                    </div>
-                </div>
+                {/* ... existing legend ... */}
             </div>
+
+            {/* Badges Section */}
+            {badges.length > 0 && (
+                <motion.div
+                    className="glass-panel"
+                    style={{ padding: '2rem', marginTop: '3rem' }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                >
+                    <h2 style={{ textAlign: 'center', marginBottom: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
+                        <span style={{ fontSize: '2.5rem' }}>🏆</span> Hall of Achievements
+                    </h2>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
+                        {badges.map((badge) => (
+                            <motion.div
+                                key={badge.key}
+                                className="card"
+                                style={{
+                                    padding: '1.5rem',
+                                    background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)',
+                                    border: '2px solid #FDE68A',
+                                    textAlign: 'center'
+                                }}
+                                whileHover={{ scale: 1.03 }}
+                            >
+                                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏅</div>
+                                <h4 style={{ color: '#92400E', marginBottom: '0.5rem' }}>{badge.title}</h4>
+                                <p style={{ color: '#B45309', fontSize: '0.9rem', margin: 0 }}>{badge.description}</p>
+                                <div style={{ marginTop: '0.8rem', fontSize: '0.75rem', color: '#D97706', fontWeight: 'bold' }}>
+                                    Earned on: {new Date(badge.earned_at).toLocaleDateString()}
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.div>
+            )}
 
             {/* Selected Node Details */}
             {selectedNode && (
