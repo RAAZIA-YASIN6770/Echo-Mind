@@ -4,8 +4,6 @@ try:
 except ImportError:
     GOOGLE_AUTH_AVAILABLE = False
 import os
-from dotenv import load_dotenv
-load_dotenv() # Load variables from .env
 from django.conf import settings
 
 class SocraticLLM:
