@@ -12,24 +12,64 @@ import random
 
 from .llm_service import llm_service
 
-# Mock Socratic Logic (Fallback for Phase 5)
+# Enhanced Mock Socratic Logic (Fallback for when LLM is not available)
 def get_mock_response(message):
     message_lower = message.lower()
-    topic = "thinking"
-    keywords = ['gravity', 'photosynthesis', 'math', 'planets', 'energy', 'cells']
-    for kw in keywords:
+    topic = "this topic"
+    keywords = {
+        'gravity': 'gravity',
+        'photosynthesis': 'photosynthesis', 
+        'math': 'mathematics',
+        'planets': 'planets',
+        'energy': 'energy',
+        'cells': 'cells',
+        'water': 'the water cycle',
+        'weather': 'weather',
+        'animals': 'animals'
+    }
+    
+    for kw, topic_name in keywords.items():
         if kw in message_lower:
-            topic = kw
+            topic = topic_name
             break
-
-    responses = [
-        f"That's a fascinating look at {topic}! What led you to that conclusion specifically?",
-        f"I see you're curious about {topic}. How does this relate to what we discussed earlier?",
-        f"Can you elaborate on the underlying principles of {topic} as you see them?",
-        f"Interesting thoughts on {topic}. What would be the counter-argument to that claim?",
-        f"Walk me through your reasoning step-by-step regarding {topic}."
+    
+    # Different types of Socratic responses
+    response_types = [
+        # Type 1: Build on their thinking
+        [
+            f"Great question about {topic}! 🌱 What do you already know about this?",
+            f"I love your curiosity about {topic}! 💡 What made you think of this question?",
+            f"Interesting thoughts on {topic}! 🤔 What examples have you seen in real life?"
+        ],
+        # Type 2: Ask for examples
+        [
+            f"Can you think of a time when you've seen {topic} in action? What did you notice?",
+            f"That's fascinating! Where else might you find examples of {topic}?",
+            f"Good thinking! Can you describe what {topic} looks like to you?"
+        ],
+        # Type 3: Encourage reasoning
+        [
+            f"Why do you think {topic} works that way? What's your theory? 🔍",
+            f"How would you explain {topic} to a friend? What would you say?",
+            f"What do you think would happen if we changed something about {topic}?"
+        ],
+        # Type 4: Make connections
+        [
+            f"How is {topic} similar to something else you've learned? 🌳",
+            f"What patterns do you notice when you think about {topic}?",
+            f"Can you connect {topic} to something in your daily life?"
+        ],
+        # Type 5: Deepen understanding
+        [
+            f"That's a great start! What questions do you still have about {topic}? ✨",
+            f"Walk me through your thinking about {topic} step by step.",
+            f"What's the most interesting part of {topic} to you, and why?"
+        ]
     ]
-    return f"Eco-Mind (Demo): {random.choice(responses)}"
+    
+    # Pick a random response type and then a random response from that type
+    response_type = random.choice(response_types)
+    return random.choice(response_type)
 
 def process_message(message):
     # Try Gemini first

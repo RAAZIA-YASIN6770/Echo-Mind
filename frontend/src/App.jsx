@@ -5,6 +5,7 @@ import TreePage from './pages/TreePage';
 import ChatPage from './pages/ChatPage';
 import ParentDashboard from './pages/ParentDashboard';
 import AchievementsPage from './pages/AchievementsPage';
+import SettingsPage from './pages/SettingsPage';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="chat" element={<ChatPage />} />
           <Route path="parents" element={<ParentDashboard />} />
           <Route path="achievements" element={<AchievementsPage />} />
+          <Route path="settings" element={<SettingsPage />} />
 
           <Route path="*" element={<HomePage />} />
         </Route>
