@@ -1,13 +1,14 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Home, Sprout, Award, Settings } from 'lucide-react';
+import { Home, MessageCircle, Sprout, Award, Settings } from 'lucide-react';
 
 const Navbar = () => {
     const location = useLocation();
 
     const navItems = [
         { path: '/', icon: Home, label: 'Home' },
+        { path: '/chat', icon: MessageCircle, label: 'Chat' },
         { path: '/tree', icon: Sprout, label: 'My Tree' },
         { path: '/achievements', icon: Award, label: 'Rewards' },
         { path: '/settings', icon: Settings, label: 'Settings' },
