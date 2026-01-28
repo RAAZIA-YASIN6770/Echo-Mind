@@ -16,6 +16,7 @@ const Navbar = () => {
 
     return (
         <nav
+            aria-label="Main navigation"
             className="glass-panel"
             style={{
                 position: 'fixed',
