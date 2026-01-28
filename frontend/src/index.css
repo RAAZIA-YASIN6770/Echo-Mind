@@ -442,6 +442,17 @@ a:hover {
   border-color: var(--color-indigo);
 }
 
+.btn-danger {
+  background: linear-gradient(135deg, var(--color-error) 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 0 10px 40px -10px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl), 0 10px 40px -10px rgba(239, 68, 68, 0.4);
+}
+
 .btn-lg {
   padding: var(--space-4) var(--space-8);
   font-size: var(--text-lg);
@@ -450,6 +461,28 @@ a:hover {
 .btn-sm {
   padding: var(--space-2) var(--space-4);
   font-size: var(--text-sm);
+}
+
+/* Button disabled state */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Spin animation for loading states */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 
 /* ========================================
