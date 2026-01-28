@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Home, MessageCircle, Sprout, Award, Settings } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
 const Navbar = () => {
     const location = useLocation();
@@ -25,6 +26,7 @@ const Navbar = () => {
                 transform: 'translateX(-50%)',
                 padding: '0.75rem 2rem',
                 display: 'flex',
+                alignItems: 'center',
                 gap: '2rem',
                 zIndex: 100,
                 borderRadius: 'var(--radius-full)'
@@ -65,6 +67,15 @@ const Navbar = () => {
                     </Link>
                 );
             })}
+
+            {/* Theme Toggle - Story 1.3 */}
+            <div style={{
+                marginLeft: '1rem',
+                paddingLeft: '1rem',
+                borderLeft: '1px solid var(--color-divider)'
+            }}>
+                <ThemeToggle />
+            </div>
         </nav>
     );
 };
