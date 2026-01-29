@@ -5,6 +5,7 @@ import api from '../services/api';
 import StreakCounter from '../components/StreakCounter';
 import BadgeDisplay from '../components/BadgeDisplay';
 import ChallengeCard from '../components/ChallengeCard';
+import LearningRoadmap from '../components/LearningRoadmap';
 import Button from '../components/ui/Button';
 import { FeatureCard, StatCard } from '../components/ui/Card';
 
@@ -22,6 +23,7 @@ const HomePage = () => {
     const [badges, setBadges] = useState([]);
     const [availableBadges, setAvailableBadges] = useState([]);
     const [challenge, setChallenge] = useState(null);
+    const [concepts, setConcepts] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -51,6 +53,17 @@ const HomePage = () => {
             const challengeRes = await api.get('/gamification/challenges/daily/');
             setChallenge(challengeRes.data.challenge);
 
+            // Fetch concepts from localStorage (Story 3.2 Mind Map data)
+            const storedConcepts = localStorage.getItem('echomind_concepts');
+            if (storedConcepts) {
+                setConcepts(JSON.parse(storedConcepts));
+            } else {
+                // Default concepts for demo
+                setConcepts([
+                    { id: 1, name: 'Learning', description: 'The foundation of knowledge', level: 0, masteryLevel: 100 }
+                ]);
+            }
+
             // Update stats
             const analytics = analyticsData.analytics || {};
             setStats({
@@ -66,6 +79,11 @@ const HomePage = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleTopicClick = (topic) => {
+        // Navigate to chat page with the topic as a query parameter
+        navigate(`/chat?topic=${encodeURIComponent(topic.name)}`);
     };
 
     const features = [
@@ -150,6 +168,15 @@ const HomePage = () => {
                         <StatCard icon="💚" label="Tree Health" value={`${stats.treeHealth}%`} loading={loading} />
                     </div>
                 </div>
+            </section>
+
+            {/* Learning Roadmap - Story 3.3 */}
+            <section className="roadmap-section" aria-labelledby="roadmap-heading">
+                <LearningRoadmap
+                    concepts={concepts}
+                    onTopicClick={handleTopicClick}
+                    loading={loading}
+                />
             </section>
 
             {/* Daily Challenge */}
