@@ -57,17 +57,31 @@ const Input = ({
         <div className={`input-wrapper ${className}`}>
             {/* Label */}
             {label && (
-                <label
+                <motion.label
                     htmlFor={inputId}
                     className="input-label"
+                    // Story 2.3: Floating label animation
+                    animate={{
+                        y: isFocused || value ? -2 : 0,
+                        scale: isFocused || value ? 0.95 : 1,
+                        color: isFocused ? 'var(--color-indigo)' : 'var(--color-text-secondary)'
+                    }}
+                    transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
                 >
                     {label}
                     {required && <span className="input-required" aria-label="required">*</span>}
-                </label>
+                </motion.label>
             )}
 
             {/* Input Container */}
-            <div className={`input-container ${icon ? 'has-icon' : ''} ${iconPosition}`}>
+            <motion.div
+                className={`input-container ${icon ? 'has-icon' : ''} ${iconPosition}`}
+                // Story 2.3: Error shake animation
+                animate={error ? {
+                    x: [-10, 10, -10, 10, 0],
+                } : {}}
+                transition={{ duration: 0.4 }}
+            >
                 {/* Icon - Left */}
                 {icon && iconPosition === 'left' && (
                     <div className="input-icon input-icon-left" aria-hidden="true">
@@ -75,8 +89,8 @@ const Input = ({
                     </div>
                 )}
 
-                {/* Input Field */}
-                <input
+                {/* Input Field with Focus Glow */}
+                <motion.input
                     id={inputId}
                     name={name}
                     type={type}
@@ -96,6 +110,24 @@ const Input = ({
                     aria-describedby={error ? errorId : undefined}
                     aria-invalid={error ? 'true' : 'false'}
                     aria-required={required}
+                    // Story 2.3: Focus glow effect
+                    animate={{
+                        boxShadow: isFocused
+                            ? '0 0 0 4px rgba(99, 102, 241, 0.2)'
+                            : error
+                                ? '0 0 0 2px rgba(239, 68, 68, 0.2)'
+                                : success
+                                    ? '0 0 0 2px rgba(16, 185, 129, 0.2)'
+                                    : '0 0 0 0px transparent',
+                        borderColor: isFocused
+                            ? 'var(--color-indigo)'
+                            : error
+                                ? 'var(--color-error)'
+                                : success
+                                    ? 'var(--color-success)'
+                                    : 'var(--color-gray-200)'
+                    }}
+                    transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
                     {...props}
                 />
 
@@ -106,14 +138,20 @@ const Input = ({
                     </div>
                 )}
 
-                {/* Success/Error Indicator */}
+                {/* Success/Error Indicator with Animation */}
                 {(error || success) && (
-                    <div className="input-indicator" aria-hidden="true">
+                    <motion.div
+                        className="input-indicator"
+                        aria-hidden="true"
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                    >
                         {error && <span className="input-error-icon">⚠️</span>}
                         {success && !error && <span className="input-success-icon">✓</span>}
-                    </div>
+                    </motion.div>
                 )}
-            </div>
+            </motion.div>
 
             {/* Error Message */}
             {error && (

@@ -70,8 +70,18 @@ const Card = ({
                         onClick(e);
                     }
                 } : undefined}
-                whileHover={hover ? { y: -5, boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)' } : {}}
-                transition={{ duration: 0.2 }}
+                // Story 2.2: Enhanced lift-up micro-interactions
+                whileHover={hover ? {
+                    y: -8,
+                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)'
+                } : {}}
+                whileTap={onClick ? {
+                    y: -4
+                } : {}}
+                transition={{
+                    duration: 0.3,
+                    ease: [0.4, 0, 0.2, 1]
+                }}
                 {...props}
             >
                 {CardContent}
@@ -99,10 +109,16 @@ export const FeatureCard = ({ icon, title, description, onClick, color, delay = 
             onClick={onClick}
             role={onClick ? 'button' : undefined}
             tabIndex={onClick ? 0 : undefined}
+            // Story 2.2: Stagger entry animation
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay, duration: 0.4 }}
-            whileHover={{ y: -10, boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)' }}
+            transition={{ delay, duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            // Story 2.2: Enhanced lift-up on hover
+            whileHover={{
+                y: -10,
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)'
+            }}
+            whileTap={{ y: -5 }}
             style={{ borderTopColor: color }}
         >
             <div className="feature-card-icon" style={{ color }}>

@@ -64,9 +64,18 @@ const Button = ({
             aria-label={ariaLabel || (typeof children === 'string' ? children : undefined)}
             aria-disabled={disabled || loading}
             aria-busy={loading}
-            whileHover={!disabled && !loading ? { scale: 1.02 } : {}}
-            whileTap={!disabled && !loading ? { scale: 0.98 } : {}}
-            transition={{ duration: 0.2 }}
+            // Story 2.1: Enhanced micro-interactions
+            whileHover={!disabled && !loading ? {
+                scale: 1.05,
+                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)'
+            } : {}}
+            whileTap={!disabled && !loading ? {
+                scale: 0.95
+            } : {}}
+            transition={{
+                duration: 0.2,
+                ease: [0.4, 0, 0.2, 1]
+            }}
             {...props}
         >
             {loading ? (
