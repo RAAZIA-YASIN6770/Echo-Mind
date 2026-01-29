@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import api from '../services/api';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import { StatCard } from '../components/ui/Card';
+import { useNavigate } from 'react-router-dom';
 
+/**
+ * TreePage - Story 3.2 Refactored
+ * Uses Card and Button components
+ * Fully responsive, dark mode support, micro-interactions
+ */
 const TreePage = () => {
+    const navigate = useNavigate();
     const [treeData, setTreeData] = useState(null);
     const [badges, setBadges] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -39,83 +49,71 @@ const TreePage = () => {
     };
 
     const getHealthColor = (health) => {
-        if (health >= 80) return '#00cc00';
+        if (health >= 80) return 'var(--color-success)';
         if (health >= 60) return '#66cc66';
-        if (health >= 40) return '#ffcc00';
+        if (health >= 40) return 'var(--color-warning)';
         if (health >= 20) return '#ff9900';
-        return '#ff6666';
+        return 'var(--color-error)';
     };
 
     if (loading) {
         return (
-            <div className="container" style={{ paddingBottom: '8rem', paddingTop: '2rem', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="container loading-container">
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    style={{ textAlign: 'center' }}
+                    className="loading-content"
                 >
-                    <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🌳</div>
-                    <div style={{ fontSize: '1.5rem', color: 'var(--color-text-secondary)' }}>Loading your Knowledge Tree...</div>
+                    <div className="loading-icon">🌳</div>
+                    <div className="loading-text">Loading your Knowledge Tree...</div>
                 </motion.div>
             </div>
         );
     }
 
     return (
-        <div className="container" style={{ paddingBottom: '8rem', paddingTop: '2rem' }}>
-            <h1 className="text-center">My Knowledge Forest 🌲</h1>
+        <main className="container tree-page">
+            <h1 className="hero-title" style={{ textAlign: 'center' }}>
+                My Knowledge Forest 🌲
+            </h1>
 
-            {/* Tree Stats Header */}
-            <motion.div
-                className="glass-panel"
-                style={{ padding: '2rem', marginTop: '2rem', marginBottom: '2rem' }}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-            >
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', textAlign: 'center' }}>
-                    <div>
-                        <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>
-                            {getTreeStateEmoji(treeData?.state)}
-                        </div>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>
-                            {treeData?.state?.replace('_', ' ').toUpperCase() || 'SEEDLING'}
-                        </div>
-                        <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>Tree Stage</div>
-                    </div>
+            {/* Tree Stats Header - Story 3.2: Using StatCard */}
+            <Card elevation="md" className="tree-stats-card">
+                <motion.div
+                    className="stats-grid"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                >
+                    <StatCard
+                        icon={getTreeStateEmoji(treeData?.state)}
+                        label="Tree Stage"
+                        value={treeData?.state?.replace('_', ' ').toUpperCase() || 'SEEDLING'}
+                    />
+                    <StatCard
+                        icon="💚"
+                        label="Health Score"
+                        value={`${treeData?.health_score || 0}%`}
+                    />
+                    <StatCard
+                        icon="🌱"
+                        label="Total Concepts"
+                        value={treeData?.nodes?.length || 0}
+                    />
+                    <StatCard
+                        icon="✅"
+                        label="Mastered"
+                        value={treeData?.nodes?.filter(n => n.mastered).length || 0}
+                    />
+                </motion.div>
+            </Card>
 
-                    <div>
-                        <div style={{ fontSize: '3rem', marginBottom: '0.5rem', color: getHealthColor(treeData?.health_score || 0) }}>
-                            {treeData?.health_score || 0}%
-                        </div>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>
-                            Health Score
-                        </div>
-                        <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
-                            {treeData?.is_wilted ? '⚠️ Needs attention!' : '✅ Healthy'}
-                        </div>
-                    </div>
-
-                    <div>
-                        <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>
-                            {treeData?.nodes?.length || 0}
-                        </div>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>
-                            Total Concepts
-                        </div>
-                        <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
-                            {treeData?.nodes?.filter(n => n.mastered).length || 0} Mastered
-                        </div>
-                    </div>
-                </div>
-            </motion.div>
-
-            {/* Tree Visualization */}
-            <div className="card glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginTop: '2rem', position: 'relative', overflow: 'hidden', minHeight: '600px' }}>
+            {/* Tree Visualization - Story 3.2: Using Card component */}
+            <Card elevation="lg" className="tree-visualization-card">
                 {/* Background decorations */}
-                <div style={{ position: 'absolute', bottom: 0, width: '100%', height: '20%', background: '#86EFAC', opacity: 0.3, borderRadius: '50% 50% 0 0 / 100% 100% 0 0' }}></div>
+                <div className="tree-ground"></div>
 
                 {/* SVG Tree */}
-                <svg width="100%" height="600" viewBox="-400 -400 800 800" style={{ position: 'relative', zIndex: 10 }}>
+                <svg width="100%" height="600" viewBox="-400 -400 800 800" className="tree-svg">
                     {/* Sky/Achievement Stars */}
                     {badges.map((badge, i) => (
                         <motion.g
@@ -163,15 +161,15 @@ const TreePage = () => {
                     {/* Tree trunk */}
                     <rect x="-30" y="250" width="60" height="150" fill="#8B4513" rx="10" />
 
-                    {/* ... (existing nodes mapping) */}
+                    {/* Tree nodes */}
                     {treeData?.nodes?.map((node, index) => (
                         <g key={node.concept_id} onClick={() => setSelectedNode(node)} style={{ cursor: 'pointer' }}>
                             <motion.circle
                                 cx={node.position_x || 0}
                                 cy={node.position_y || 0}
                                 r="15"
-                                fill={node.mastered ? '#10B981' : '#E5E7EB'}
-                                stroke={node.mastered ? '#059669' : '#D1D5DB'}
+                                fill={node.mastered ? 'var(--color-success)' : 'var(--color-gray-200)'}
+                                stroke={node.mastered ? '#059669' : 'var(--color-gray-300)'}
                                 strokeWidth="2"
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
@@ -182,7 +180,11 @@ const TreePage = () => {
                                 <text
                                     x={node.position_x || 0}
                                     y={node.position_y || 0}
-                                    textAnchor="middle" dy="0.3em" fontSize="12" fill="white" fontWeight="bold"
+                                    textAnchor="middle"
+                                    dy="0.3em"
+                                    fontSize="12"
+                                    fill="white"
+                                    fontWeight="bold"
                                 >
                                     ✓
                                 </text>
@@ -192,7 +194,11 @@ const TreePage = () => {
 
                     {/* Main tree icon */}
                     <motion.text
-                        x="0" y="0" fontSize="150" textAnchor="middle" dy="0.3em"
+                        x="0"
+                        y="0"
+                        fontSize="150"
+                        textAnchor="middle"
+                        dy="0.3em"
                         initial={{ scale: 0.5, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ duration: 1, type: 'spring' }}
@@ -200,107 +206,108 @@ const TreePage = () => {
                         {getTreeStateEmoji(treeData?.state)}
                     </motion.text>
                 </svg>
+            </Card>
 
-                {/* Legend */}
-                {/* ... existing legend ... */}
-            </div>
-
-            {/* Badges Section */}
+            {/* Badges Section - Story 3.2: Using Card component */}
             {badges.length > 0 && (
-                <motion.div
-                    className="glass-panel"
-                    style={{ padding: '2rem', marginTop: '3rem' }}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                >
-                    <h2 style={{ textAlign: 'center', marginBottom: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
-                        <span style={{ fontSize: '2.5rem' }}>🏆</span> Hall of Achievements
-                    </h2>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
-                        {badges.map((badge) => (
-                            <motion.div
-                                key={badge.key}
-                                className="card"
-                                style={{
-                                    padding: '1.5rem',
-                                    background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)',
-                                    border: '2px solid #FDE68A',
-                                    textAlign: 'center'
-                                }}
-                                whileHover={{ scale: 1.03 }}
-                            >
-                                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏅</div>
-                                <h4 style={{ color: '#92400E', marginBottom: '0.5rem' }}>{badge.title}</h4>
-                                <p style={{ color: '#B45309', fontSize: '0.9rem', margin: 0 }}>{badge.description}</p>
-                                <div style={{ marginTop: '0.8rem', fontSize: '0.75rem', color: '#D97706', fontWeight: 'bold' }}>
-                                    Earned on: {new Date(badge.earned_at).toLocaleDateString()}
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                </motion.div>
-            )}
-
-            {/* Selected Node Details */}
-            {selectedNode && (
-                <motion.div
-                    className="glass-panel"
-                    style={{ padding: '2rem', marginTop: '2rem' }}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                        <div>
-                            <h3 style={{ marginBottom: '1rem' }}>{selectedNode.title}</h3>
-                            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                                <div>
-                                    <strong>Status:</strong> {selectedNode.mastered ? '✅ Mastered' : '📚 Learning'}
-                                </div>
-                                <div>
-                                    <strong>Confidence:</strong> {Math.round(selectedNode.mastery_confidence * 100)}%
-                                </div>
-                                {selectedNode.last_practiced && (
-                                    <div>
-                                        <strong>Last Practiced:</strong> {new Date(selectedNode.last_practiced).toLocaleDateString()}
-                                    </div>
-                                )}
-                            </div>
+                <Card elevation="md" className="badges-section">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                    >
+                        <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                            <span style={{ fontSize: '2.5rem', marginRight: '1rem' }}>🏆</span>
+                            Hall of Achievements
+                        </h2>
+                        <div className="badges-grid">
+                            {badges.map((badge, index) => (
+                                <Card
+                                    key={badge.key}
+                                    hover={true}
+                                    elevation="sm"
+                                    className="badge-card"
+                                >
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: index * 0.1 }}
+                                        className="badge-content"
+                                    >
+                                        <div className="badge-icon">🏅</div>
+                                        <h4 className="badge-title">{badge.title}</h4>
+                                        <p className="badge-description">{badge.description}</p>
+                                        <div className="badge-date">
+                                            Earned on: {new Date(badge.earned_at).toLocaleDateString()}
+                                        </div>
+                                    </motion.div>
+                                </Card>
+                            ))}
                         </div>
-                        <button
-                            onClick={() => setSelectedNode(null)}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                fontSize: '1.5rem',
-                                cursor: 'pointer',
-                                color: 'var(--color-text-secondary)'
-                            }}
-                        >
-                            ✕
-                        </button>
-                    </div>
-                </motion.div>
+                    </motion.div>
+                </Card>
             )}
 
-            {/* Empty State */}
-            {(!treeData?.nodes || treeData.nodes.length === 0) && (
-                <motion.div
-                    className="glass-panel"
-                    style={{ padding: '3rem', marginTop: '2rem', textAlign: 'center' }}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                >
-                    <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🌱</div>
-                    <h3 style={{ marginBottom: '1rem' }}>Your tree is just starting!</h3>
-                    <p style={{ color: 'var(--color-text-secondary)', marginBottom: '2rem' }}>
-                        Start chatting with EchoMind to grow your first concepts.
-                    </p>
-                    <a href="/chat" style={{ textDecoration: 'none' }}>
-                        <button className="btn btn-primary">Start Learning</button>
-                    </a>
-                </motion.div>
+            {/* Selected Node Details - Story 3.2: Using Card component */}
+            {selectedNode && (
+                <Card elevation="lg" className="node-details-card">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="node-details"
+                    >
+                        <div className="node-header">
+                            <div>
+                                <h3 className="node-title">{selectedNode.title}</h3>
+                                <div className="node-stats">
+                                    <div className="node-stat">
+                                        <strong>Status:</strong> {selectedNode.mastered ? '✅ Mastered' : '📚 Learning'}
+                                    </div>
+                                    <div className="node-stat">
+                                        <strong>Confidence:</strong> {Math.round(selectedNode.mastery_confidence * 100)}%
+                                    </div>
+                                    {selectedNode.last_practiced && (
+                                        <div className="node-stat">
+                                            <strong>Last Practiced:</strong> {new Date(selectedNode.last_practiced).toLocaleDateString()}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setSelectedNode(null)}
+                                className="close-button"
+                                aria-label="Close"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    </motion.div>
+                </Card>
             )}
-        </div>
+
+            {/* Empty State - Story 3.2: Using Card and Button components */}
+            {(!treeData?.nodes || treeData.nodes.length === 0) && (
+                <Card elevation="md" className="empty-state-card">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="empty-state"
+                    >
+                        <div className="empty-icon">🌱</div>
+                        <h3 className="empty-title">Your tree is just starting!</h3>
+                        <p className="empty-description">
+                            Start chatting with EchoMind to grow your first concepts.
+                        </p>
+                        <Button
+                            variant="primary"
+                            size="lg"
+                            onClick={() => navigate('/chat')}
+                        >
+                            Start Learning
+                        </Button>
+                    </motion.div>
+                </Card>
+            )}
+        </main>
     );
 };
 

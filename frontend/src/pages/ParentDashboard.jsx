@@ -2,7 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ShieldAlert, CheckCircle, Clock, AlertTriangle, MessageSquare } from 'lucide-react';
 import api from '../services/api';
+import Card from '../components/ui/Card';
+import { StatCard } from '../components/ui/Card';
 
+/**
+ * ParentDashboard - Refactored for Week 2 Finalization
+ * Uses Card and StatCard components, fully responsive, dark mode support
+ */
 const ParentDashboard = () => {
     const [alerts, setAlerts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -25,10 +31,10 @@ const ParentDashboard = () => {
 
     const getAlertColor = (type) => {
         switch (type) {
-            case 'inappropriate_language': return '#EF4444'; // Red
-            case 'pii_leak': return '#F59E0B'; // Orange
-            case 'prompt_injection': return '#7C3AED'; // Purple
-            default: return '#6B7280'; // Gray
+            case 'inappropriate_language': return 'var(--color-error)';
+            case 'pii_leak': return 'var(--color-warning)';
+            case 'prompt_injection': return '#7C3AED';
+            default: return 'var(--color-gray-500)';
         }
     };
 
@@ -43,111 +49,112 @@ const ParentDashboard = () => {
 
     if (loading) {
         return (
-            <div className="container" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
-                <h3>Loading Parent Dashboard...</h3>
+            <div className="container loading-container">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="loading-content"
+                >
+                    <h3>Loading Parent Dashboard...</h3>
+                </motion.div>
             </div>
         );
     }
 
     return (
-        <div className="container" style={{ paddingBottom: '8rem', paddingTop: '2rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                <ShieldAlert size={36} color="#4F46E5" />
-                <h1 style={{ margin: 0 }}>Parent Safety Dashboard</h1>
+        <main className="container parent-dashboard">
+            {/* Page Header */}
+            <div className="dashboard-header">
+                <ShieldAlert size={36} color="var(--color-indigo)" />
+                <h1 className="hero-title">Parent Safety Dashboard</h1>
             </div>
 
-            <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem' }}>
-                <h3>Safety Summary</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginTop: '1.5rem' }}>
-                    <div style={{ padding: '1rem', background: '#FEE2E2', borderRadius: '1rem', textAlign: 'center' }}>
-                        <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#B91C1C' }}>
-                            {alerts.filter(a => a.type === 'inappropriate_language').length}
-                        </div>
-                        <div style={{ fontSize: '0.9rem', color: '#991B1B' }}>Language Alerts</div>
-                    </div>
-                    <div style={{ padding: '1rem', background: '#FEF3C7', borderRadius: '1rem', textAlign: 'center' }}>
-                        <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#92400E' }}>
-                            {alerts.filter(a => a.type === 'pii_leak').length}
-                        </div>
-                        <div style={{ fontSize: '0.9rem', color: '#854D0E' }}>Privacy Alerts</div>
-                    </div>
-                    <div style={{ padding: '1rem', background: '#F3F4F6', borderRadius: '1rem', textAlign: 'center' }}>
-                        <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#374151' }}>
-                            {alerts.length}
-                        </div>
-                        <div style={{ fontSize: '0.9rem', color: '#4B5563' }}>Total Incidents</div>
-                    </div>
+            {/* Safety Summary */}
+            <Card elevation="md" className="safety-summary-card">
+                <h3 className="section-title">Safety Summary</h3>
+                <div className="stats-grid">
+                    <StatCard
+                        icon="⚠️"
+                        label="Language Alerts"
+                        value={alerts.filter(a => a.type === 'inappropriate_language').length}
+                    />
+                    <StatCard
+                        icon="🛡️"
+                        label="Privacy Alerts"
+                        value={alerts.filter(a => a.type === 'pii_leak').length}
+                    />
+                    <StatCard
+                        icon="📊"
+                        label="Total Incidents"
+                        value={alerts.length}
+                    />
                 </div>
-            </div>
+            </Card>
 
-            <h2>Recent Alerts</h2>
+            {/* Recent Alerts */}
+            <h2 className="section-title">Recent Alerts</h2>
             {alerts.length === 0 ? (
-                <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center' }}>
-                    <CheckCircle size={48} color="#10B981" style={{ marginBottom: '1rem' }} />
-                    <p style={{ color: 'var(--color-text-secondary)' }}>All quiet! No safety incidents detected recently. ✨</p>
-                </div>
+                <Card elevation="md" className="empty-alerts-card">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="empty-alerts-content"
+                    >
+                        <CheckCircle size={48} color="var(--color-success)" className="success-icon" />
+                        <p className="empty-alerts-text">
+                            All quiet! No safety incidents detected recently. ✨
+                        </p>
+                    </motion.div>
+                </Card>
             ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div className="alerts-list">
                     {alerts.map((alert, index) => (
-                        <motion.div
+                        <Card
                             key={alert.id}
-                            className="card"
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            style={{
-                                padding: '1.5rem',
-                                borderLeft: `6px solid ${getAlertColor(alert.type)}`,
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}
+                            hover={true}
+                            elevation="sm"
+                            className="alert-card"
+                            style={{ borderLeft: `6px solid ${getAlertColor(alert.type)}` }}
                         >
-                            <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-                                <div style={{
-                                    padding: '0.75rem',
-                                    background: `${getAlertColor(alert.type)}20`,
-                                    color: getAlertColor(alert.type),
-                                    borderRadius: '12px'
-                                }}>
-                                    {getAlertIcon(alert.type)}
+                            <motion.div
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                                className="alert-content"
+                            >
+                                <div className="alert-main">
+                                    <div
+                                        className="alert-icon-container"
+                                        style={{
+                                            background: `${getAlertColor(alert.type)}20`,
+                                            color: getAlertColor(alert.type),
+                                        }}
+                                    >
+                                        {getAlertIcon(alert.type)}
+                                    </div>
+                                    <div className="alert-details">
+                                        <div className="alert-type">
+                                            {alert.type.replace('_', ' ')}
+                                        </div>
+                                        <div className="alert-timestamp">
+                                            {new Date(alert.timestamp).toLocaleString()}
+                                        </div>
+                                        <div className="alert-message">
+                                            "{alert.content}"
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <div style={{ fontWeight: 'bold', fontSize: '1.1rem', textTransform: 'capitalize' }}>
-                                        {alert.type.replace('_', ' ')}
-                                    </div>
-                                    <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', marginTop: '0.25rem' }}>
-                                        {new Date(alert.timestamp).toLocaleString()}
-                                    </div>
-                                    <div style={{
-                                        marginTop: '1rem',
-                                        padding: '0.75rem',
-                                        background: '#F9FAFB',
-                                        borderRadius: '8px',
-                                        fontStyle: 'italic',
-                                        border: '1px solid #E5E7EB'
-                                    }}>
-                                        "{alert.content}"
-                                    </div>
+                                <div className="alert-status">
+                                    <span className={`status-badge ${alert.resolved ? 'resolved' : 'pending'}`}>
+                                        {alert.resolved ? 'RESOLVED' : 'PENDING'}
+                                    </span>
                                 </div>
-                            </div>
-                            <div style={{ textAlign: 'right' }}>
-                                <span style={{
-                                    padding: '0.25rem 0.75rem',
-                                    borderRadius: 'var(--radius-full)',
-                                    background: alert.resolved ? '#D1FAE5' : '#FEE2E2',
-                                    color: alert.resolved ? '#065F46' : '#991B1B',
-                                    fontSize: '0.8rem',
-                                    fontWeight: 'bold'
-                                }}>
-                                    {alert.resolved ? 'RESOLVED' : 'PENDING'}
-                                </span>
-                            </div>
-                        </motion.div>
+                            </motion.div>
+                        </Card>
                     ))}
                 </div>
             )}
-        </div>
+        </main>
     );
 };
 

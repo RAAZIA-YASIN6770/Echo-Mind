@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { User, Bell, Shield, Palette, Volume2, Globe, LogOut, Save } from 'lucide-react';
+import { User, Bell, Shield, Palette, Globe, LogOut, Save } from 'lucide-react';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
 
+/**
+ * SettingsPage - Story 3.1 Refactored
+ * Uses Card, Button, and Input components
+ * Fully responsive, dark mode support, micro-interactions
+ */
 const SettingsPage = () => {
     const [settings, setSettings] = useState({
         // User Profile
@@ -44,48 +52,47 @@ const SettingsPage = () => {
     };
 
     return (
-        <div className="container" style={{ paddingBottom: '8rem', paddingTop: '2rem', maxWidth: '1400px' }}>
+        <main className="container" style={{ paddingBottom: '8rem', paddingTop: '2rem', maxWidth: '1400px' }}>
+            {/* Page Title */}
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
             >
-                <h1 className="text-center" style={{ marginBottom: '3rem' }}>
+                <h1 className="hero-title" style={{ textAlign: 'center', marginBottom: '3rem' }}>
                     Settings ⚙️
                 </h1>
             </motion.div>
 
-            {/* Landscape Layout - 2 Column Grid */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))',
-                gap: '2rem',
-                marginBottom: '3rem'
-            }}>
+            {/* Settings Grid - Story 3.1: Responsive 2-column layout */}
+            <div className="settings-grid">
                 {/* Left Column */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                <div className="settings-column">
                     {/* User Profile Section */}
                     <SettingsSection
                         icon={<User size={24} />}
                         title="User Profile"
                         delay={0.1}
                     >
-                        <InputField
+                        <Input
                             label="Username"
                             value={settings.username}
                             onChange={(e) => handleChange('username', e.target.value)}
+                            placeholder="Enter your username"
                         />
-                        <InputField
+                        <Input
                             label="Email"
                             type="email"
                             value={settings.email}
                             onChange={(e) => handleChange('email', e.target.value)}
+                            placeholder="your.email@example.com"
                         />
-                        <InputField
+                        <Input
                             label="Age"
                             type="number"
                             value={settings.age}
                             onChange={(e) => handleChange('age', parseInt(e.target.value))}
+                            placeholder="Your age"
                         />
                     </SettingsSection>
 
@@ -133,14 +140,14 @@ const SettingsPage = () => {
                             checked={settings.shareProgress}
                             onChange={(checked) => handleChange('shareProgress', checked)}
                         />
-                        <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(99, 102, 241, 0.1)', borderRadius: 'var(--radius-lg)', fontSize: '0.9rem', color: 'var(--color-gray-700)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+                        <div className="info-box">
                             🛡️ Your safety is our priority. All conversations are monitored for inappropriate content.
                         </div>
                     </SettingsSection>
                 </div>
 
                 {/* Right Column */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                <div className="settings-column">
                     {/* Appearance Section */}
                     <SettingsSection
                         icon={<Palette size={24} />}
@@ -203,139 +210,70 @@ const SettingsPage = () => {
                         />
                     </SettingsSection>
 
-                    {/* Account Actions Section */}
+                    {/* Account Actions Section - Story 3.1: Using Button component */}
                     <SettingsSection
                         icon={<User size={24} />}
                         title="Account Actions"
                         delay={0.6}
                     >
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <motion.button
-                                className="btn btn-primary"
-                                style={{
-                                    fontSize: '1rem',
-                                    padding: '0.875rem 2rem',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '0.5rem',
-                                    width: '100%'
-                                }}
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
+                        <div className="button-group">
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                icon={<Save size={18} />}
                                 onClick={handleSave}
+                                className="full-width"
                             >
-                                <Save size={18} />
                                 {saved ? '✅ Settings Saved!' : 'Save All Settings'}
-                            </motion.button>
+                            </Button>
 
-                            <button
-                                style={{
-                                    background: 'none',
-                                    border: '2px solid #ef4444',
-                                    color: '#ef4444',
-                                    padding: '0.875rem 2rem',
-                                    borderRadius: 'var(--radius-xl)',
-                                    fontSize: '1rem',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '0.5rem',
-                                    transition: 'all 0.3s ease',
-                                    width: '100%'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.background = '#ef4444';
-                                    e.target.style.color = 'white';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.background = 'none';
-                                    e.target.style.color = '#ef4444';
-                                }}
+                            <Button
+                                variant="danger"
+                                size="lg"
+                                icon={<LogOut size={18} />}
+                                className="full-width"
                             >
-                                <LogOut size={18} />
                                 Logout from Account
-                            </button>
+                            </Button>
                         </div>
                     </SettingsSection>
                 </div>
             </div>
-
-            {/* Mobile Responsive Note */}
-            <style jsx>{`
-                @media (max-width: 1100px) {
-                    .container > div:first-of-type {
-                        grid-template-columns: 1fr !important;
-                    }
-                }
-            `}</style>
-        </div>
+        </main>
     );
-
 };
 
-// Reusable Components
+// Story 3.1: Refactored SettingsSection using Card component
 const SettingsSection = ({ icon, title, children, delay }) => (
-    <motion.div
-        className="glass-panel"
-        style={{ padding: '2rem', marginBottom: '2rem' }}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay, duration: 0.4 }}
+    <Card
+        hover={false}
+        elevation="md"
+        className="settings-section"
     >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-            <div style={{ color: 'var(--color-primary)' }}>{icon}</div>
-            <h2 style={{ margin: 0, fontSize: '1.5rem' }}>{title}</h2>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {children}
-        </div>
-    </motion.div>
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay, duration: 0.4 }}
+        >
+            <div className="section-header">
+                <div className="section-icon">{icon}</div>
+                <h2 className="section-title">{title}</h2>
+            </div>
+            <div className="section-content">
+                {children}
+            </div>
+        </motion.div>
+    </Card>
 );
 
-const InputField = ({ label, type = 'text', value, onChange }) => (
-    <div>
-        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--color-text-main)' }}>
-            {label}
-        </label>
-        <input
-            type={type}
-            value={value}
-            onChange={onChange}
-            style={{
-                width: '100%',
-                padding: '0.75rem 1rem',
-                borderRadius: 'var(--radius-md)',
-                border: '2px solid var(--color-border)',
-                fontSize: '1rem',
-                transition: 'border-color 0.3s ease'
-            }}
-            onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
-            onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
-        />
-    </div>
-);
-
+// SelectField component - using native select with our styles
 const SelectField = ({ label, value, onChange, options }) => (
-    <div>
-        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--color-text-main)' }}>
-            {label}
-        </label>
+    <div className="select-field">
+        <label className="input-label">{label}</label>
         <select
             value={value}
             onChange={onChange}
-            style={{
-                width: '100%',
-                padding: '0.75rem 1rem',
-                borderRadius: 'var(--radius-md)',
-                border: '2px solid var(--color-border)',
-                fontSize: '1rem',
-                cursor: 'pointer',
-                transition: 'border-color 0.3s ease'
-            }}
-            onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
-            onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
+            className="input-field"
         >
             {options.map(option => (
                 <option key={option.value} value={option.value}>
@@ -346,37 +284,25 @@ const SelectField = ({ label, value, onChange, options }) => (
     </div>
 );
 
+// ToggleSwitch component - Story 3.1: Enhanced with micro-interactions
 const ToggleSwitch = ({ label, checked, onChange }) => (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <label style={{ fontWeight: '500', color: 'var(--color-text-main)' }}>
-            {label}
-        </label>
-        <div
+    <div className="toggle-switch-container">
+        <label className="toggle-label">{label}</label>
+        <motion.div
+            className="toggle-switch"
             onClick={() => onChange(!checked)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             style={{
-                width: '50px',
-                height: '26px',
-                borderRadius: '13px',
-                background: checked ? 'var(--color-primary)' : '#ccc',
-                position: 'relative',
-                cursor: 'pointer',
-                transition: 'background 0.3s ease'
+                background: checked ? 'var(--color-indigo)' : 'var(--color-gray-300)',
             }}
         >
             <motion.div
-                style={{
-                    width: '22px',
-                    height: '22px',
-                    borderRadius: '50%',
-                    background: 'white',
-                    position: 'absolute',
-                    top: '2px',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                }}
+                className="toggle-thumb"
                 animate={{ left: checked ? '26px' : '2px' }}
                 transition={{ type: 'spring', stiffness: 500, damping: 30 }}
             />
-        </div>
+        </motion.div>
     </div>
 );
 

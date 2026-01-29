@@ -2,7 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import api from '../services/api';
 import BadgeDisplay from '../components/BadgeDisplay';
+import Card from '../components/ui/Card';
 
+/**
+ * AchievementsPage - Refactored for Week 2 Finalization
+ * Uses Card components, fully responsive, dark mode support
+ */
 const AchievementsPage = () => {
     const [badges, setBadges] = useState([]);
     const [availableBadges, setAvailableBadges] = useState([]);
@@ -28,51 +33,78 @@ const AchievementsPage = () => {
         }
     };
 
+    const howToEarn = [
+        {
+            icon: '🔥',
+            title: 'Daily Streak',
+            description: 'Learn every day to unlock streak bonuses.',
+        },
+        {
+            icon: '🧠',
+            title: 'Master Concepts',
+            description: 'Grow your tree by mastering new topics.',
+        },
+        {
+            icon: '🤝',
+            title: 'Help Others',
+            description: 'Teach what you learned to your family!',
+        },
+    ];
+
     return (
-        <div className="container" style={{ paddingBottom: '8rem', paddingTop: '2rem' }}>
+        <main className="container achievements-page">
+            {/* Page Header */}
             <motion.div
+                className="page-header"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                style={{ textAlign: 'center', marginBottom: '3rem' }}
             >
-                <h1 style={{ fontSize: '3rem' }}>Your Trophy Room 🏆</h1>
-                <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.2rem' }}>
+                <h1 className="hero-title">Your Trophy Room 🏆</h1>
+                <p className="hero-subtitle">
                     Every badge represents a new peak you've climbed!
                 </p>
             </motion.div>
 
+            {/* Badge Display */}
             <BadgeDisplay
                 badges={badges}
                 availableBadges={availableBadges}
                 loading={loading}
             />
 
+            {/* How to Earn Section */}
             <motion.div
-                style={{ marginTop: '3rem', textAlign: 'center' }}
+                className="how-to-earn-section"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
             >
-                <h3>How to earn more?</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', marginTop: '1.5rem' }}>
-                    <div className="card">
-                        <div style={{ fontSize: '2rem' }}>🔥</div>
-                        <h4>Daily Streak</h4>
-                        <p>Learn every day to unlock streak bonuses.</p>
-                    </div>
-                    <div className="card">
-                        <div style={{ fontSize: '2rem' }}>🧠</div>
-                        <h4>Master Concepts</h4>
-                        <p>Grow your tree by mastering new topics.</p>
-                    </div>
-                    <div className="card">
-                        <div style={{ fontSize: '2rem' }}>🤝</div>
-                        <h4>Help Others</h4>
-                        <p>Teach what you learned to your family!</p>
-                    </div>
+                <h3 className="section-title" style={{ textAlign: 'center' }}>
+                    How to earn more?
+                </h3>
+                <div className="how-to-earn-grid">
+                    {howToEarn.map((item, index) => (
+                        <Card
+                            key={item.title}
+                            hover={true}
+                            elevation="sm"
+                            className="how-to-earn-card"
+                        >
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.6 + index * 0.1 }}
+                                className="how-to-earn-content"
+                            >
+                                <div className="earn-icon">{item.icon}</div>
+                                <h4 className="earn-title">{item.title}</h4>
+                                <p className="earn-description">{item.description}</p>
+                            </motion.div>
+                        </Card>
+                    ))}
                 </div>
             </motion.div>
-        </div>
+        </main>
     );
 };
 
