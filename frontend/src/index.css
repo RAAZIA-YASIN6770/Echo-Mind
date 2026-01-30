@@ -2914,9 +2914,7 @@ nav a:focus-visible {
     color: white;
 }
 
-.difficulty-badge {
-    /* Color set inline based on difficulty */
-}
+/* .difficulty-badge color is set inline based on difficulty level */
 
 .category-badge {
     background: var(--color-gray-600);
