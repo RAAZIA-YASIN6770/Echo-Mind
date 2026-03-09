@@ -149,29 +149,28 @@ Open your browser and go to: **http://localhost:5173**
 
 ```
 echomind/
-├── 📄 Documentation
-│   ├── README.md                    # This file
-│   ├── PROJECT_OVERVIEW.md          # Complete project overview
-│   ├── COMPLETE_STATUS_REPORT.md    # Feature status report
-│   ├── QUICK_START_GUIDE.md         # Detailed setup guide
-│   ├── TESTING_CHECKLIST.md         # Testing procedures
-│   └── CONNECTION_MAP.md            # API connection guide
+├── � docs/                         # Project documentation sub-folders
+│   ├── management/                  # Project plans and charters
+│   ├── reports/                     # Status and story reports
+│   ├── technical/                   # Architecture and design specs
+│   └── verification/                # Test logs and compliance
 │
 ├── 🐍 Backend (Django)
-│   ├── EchoMind/                    # Main Django project
-│   ├── socratic_engine/             # AI chat system
-│   ├── gamification/                # Gamification features
-│   ├── safety/                      # Security features
-│   ├── tests/                       # Test suite
+│   ├── EchoMind/                    # Main Django settings
+│   ├── socratic_engine/             # AI chat logic
+│   ├── gamification/                # Streaks and badges
+│   ├── safety/                      # Content filtering
+│   ├── personalization-service/     # Adaptive learning
+│   ├── tests/                       # Unit and integration tests
 │   └── manage.py
 │
-└── ⚛️ Frontend (React)
-    └── frontend/
-        ├── src/
-        │   ├── pages/               # Page components
-        │   ├── components/          # Reusable components
-        │   └── services/            # API client
-        └── package.json
+├── ⚛️ Frontend (React/Vite)
+│   └── frontend/
+│       ├── src/                     # Source code (pages, components)
+│       └── package.json
+│
+└── 🏛️ Infrastructure
+    └── infra/                       # Docker & K8s configs
 ```
 
 ---
@@ -242,12 +241,13 @@ Unlock 10 unique badges as you progress through your learning journey.
 
 ## 📚 Documentation
 
-- **[PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md)** - Complete project structure and features
-- **[COMPLETE_STATUS_REPORT.md](COMPLETE_STATUS_REPORT.md)** - Detailed feature completion status
-- **[QUICK_START_GUIDE.md](QUICK_START_GUIDE.md)** - Step-by-step setup and troubleshooting
-- **[TESTING_CHECKLIST.md](TESTING_CHECKLIST.md)** - Comprehensive testing procedures
-- **[CONNECTION_MAP.md](CONNECTION_MAP.md)** - Frontend-backend API connections
-- **[Eco-Mind AI - Complete Project Plan.md](Eco-Mind%20AI%20-%20Complete%20Project%20Plan.md)** - 24-week development plan
+The project documentation is organized in the `docs/` directory:
+
+- **[Management](docs/management/)** - Project plans, charters, and high-level summaries.
+- **[Reports](docs/reports/)** - Sprint summaries, story reports, and status updates.
+- **[Technical](docs/technical/)** - Architecture, design systems, and technical specs.
+- **[Verification](docs/verification/)** - Test results, checklists, and compliance reports.
+- **[Archive](docs/archive/)** - Outdated logs or reference files.
 
 ---
 
